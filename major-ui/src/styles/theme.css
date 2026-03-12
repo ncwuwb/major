@@ -1,0 +1,30 @@
+﻿:root {
+  --bg-page: #edf3f6;
+  --bg-surface: rgba(255, 255, 255, 0.9);
+  --bg-strong: #ffffff;
+  --bg-soft: #eef4f5;
+  --line-soft: rgba(22, 52, 61, 0.12);
+  --line-strong: rgba(22, 52, 61, 0.22);
+  --text-primary: #17343d;
+  --text-secondary: #4a6670;
+  --text-muted: #7f97a0;
+  --brand-primary: #0f9d8a;
+  --brand-primary-deep: #0a7567;
+  --brand-accent: #f29b38;
+  --brand-danger: #d64545;
+  --brand-warning: #d68c1d;
+  --brand-success: #1f9d67;
+  --sidebar-bg: #f7fbfc;
+  --sidebar-bg-deep: #eef5f7;
+  --sidebar-text: #26434d;
+  --sidebar-text-muted: #6f8590;
+  --sidebar-active-text: #0a7567;
+  --sidebar-active-bg: linear-gradient(90deg, rgba(15, 157, 138, 0.18), rgba(15, 157, 138, 0.05));
+  --sidebar-hover-bg: rgba(15, 157, 138, 0.08);
+  --shadow-card: 0 18px 40px rgba(13, 56, 61, 0.12);
+  --shadow-soft: 0 10px 30px rgba(17, 47, 54, 0.08);
+  --radius-lg: 24px;
+  --radius-md: 18px;
+  --radius-sm: 12px;
+  --font-main: 'Segoe UI Variable', 'PingFang SC', 'Microsoft YaHei UI', 'Trebuchet MS', sans-serif;
+}

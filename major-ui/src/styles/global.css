@@ -1,0 +1,257 @@
+﻿* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  margin: 0;
+  min-height: 100%;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-main);
+  background:
+    radial-gradient(circle at top left, rgba(15, 157, 138, 0.12), transparent 24%),
+    radial-gradient(circle at 86% 8%, rgba(242, 155, 56, 0.16), transparent 18%),
+    linear-gradient(180deg, #f7fbfc 0%, #ecf3f6 100%);
+  color: var(--text-primary);
+}
+
+body .el-overlay {
+  backdrop-filter: blur(6px);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+img {
+  max-width: 100%;
+}
+
+.page-shell {
+  padding: 24px;
+}
+
+.page-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(14px);
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease,
+    border-color 220ms ease,
+    background-color 220ms ease;
+}
+
+.page-card + .page-card {
+  margin-top: 20px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.section-title h2,
+.section-title h3,
+.section-title h4 {
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.section-title p {
+  margin: 6px 0 0;
+  color: var(--text-secondary);
+}
+
+.grid-two {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.grid-three {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.grid-four {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.toolbar--between {
+  justify-content: space-between;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.form-grid--compact {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.span-2 {
+  grid-column: span 2;
+}
+
+.span-4 {
+  grid-column: 1 / -1;
+}
+
+.data-table {
+  width: 100%;
+}
+
+.card-table :deep(.el-table),
+.card-table :deep(.el-table th.el-table__cell) {
+  background: transparent;
+}
+
+.empty-inline {
+  padding: 32px 0;
+}
+
+.dashboard-fade-up {
+  animation: dashboardFadeUp 720ms cubic-bezier(0.2, 0.75, 0.2, 1) both;
+  animation-delay: var(--enter-delay, 0ms);
+}
+
+.el-card,
+.el-dialog,
+.el-drawer__body,
+.el-table,
+.el-pagination {
+  --el-border-radius-base: 14px;
+}
+
+.el-button,
+.el-input__wrapper,
+.el-select__wrapper,
+.el-textarea__inner,
+.el-input-number {
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease,
+    border-color 200ms ease,
+    background-color 200ms ease;
+}
+
+.el-button--primary {
+  --el-button-bg-color: var(--brand-primary);
+  --el-button-border-color: var(--brand-primary);
+  --el-button-hover-bg-color: var(--brand-primary-deep);
+  --el-button-hover-border-color: var(--brand-primary-deep);
+}
+
+.el-button:hover {
+  transform: translateY(-1px);
+}
+
+.el-tag--danger {
+  --el-tag-bg-color: rgba(214, 69, 69, 0.12);
+  --el-tag-border-color: rgba(214, 69, 69, 0.18);
+  --el-tag-text-color: var(--brand-danger);
+}
+
+@keyframes dashboardFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 1400px) {
+  .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1200px) {
+  .grid-four,
+  .grid-three {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .page-shell {
+    padding: 16px;
+  }
+
+  .grid-two,
+  .grid-three,
+  .grid-four,
+  .form-grid,
+  .form-grid--compact {
+    grid-template-columns: 1fr;
+  }
+
+  .span-2,
+  .span-4 {
+    grid-column: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .dashboard-fade-up,
+  .page-card,
+  .el-button,
+  .el-input__wrapper,
+  .el-select__wrapper,
+  .el-textarea__inner,
+  .el-input-number {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}
