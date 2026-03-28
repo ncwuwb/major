@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { computed } from 'vue'
 import { useDateFormat, useNow } from '@vueuse/core'
 import { ArrowRight, Expand, Fold, SwitchButton } from '@element-plus/icons-vue'
@@ -44,7 +44,6 @@ function handleLogout() {
         <span class="muted">当前时间</span>
         <strong>{{ nowText }}</strong>
       </div>
-      <el-tag v-if="appStore.demoMode" type="warning" effect="dark">答辩演示模式</el-tag>
       <el-dropdown>
         <div class="app-header__user">
           <div>

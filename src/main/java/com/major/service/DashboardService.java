@@ -11,6 +11,7 @@ import com.major.domain.vo.DashboardRankVO;
 import com.major.domain.vo.DashboardScoreVO;
 import com.major.domain.vo.DashboardTrendPointVO;
 import com.major.domain.vo.WarningDetailVO;
+import com.major.domain.vo.WarningMetricVO;
 import com.major.mapper.DashboardMapper;
 import com.major.mapper.IndicatorRuleMapper;
 import java.math.BigDecimal;
@@ -58,6 +59,20 @@ public class DashboardService {
                 DashboardTrendPointVO point = new DashboardTrendPointVO();
                 point.setStatYear(year);
                 point.setMetricValue(phdRate);
+                result.add(point);
+            }
+            return result;
+        }
+        if (IndicatorConstants.COURSE_COUNT.equals(request.getMetric())) {
+            DashboardOverviewVO overview = dashboardMapper.selectOverview(deptId, majorId, endYear);
+            BigDecimal courseCount = overview == null || overview.getCourseCount() == null
+                ? BigDecimal.ZERO
+                : BigDecimal.valueOf(overview.getCourseCount());
+            List<DashboardTrendPointVO> result = new ArrayList<>();
+            for (int year = startYear; year <= endYear; year++) {
+                DashboardTrendPointVO point = new DashboardTrendPointVO();
+                point.setStatYear(year);
+                point.setMetricValue(courseCount);
                 result.add(point);
             }
             return result;
@@ -112,9 +127,82 @@ public class DashboardService {
         warningService.recalculateAll();
     }
 
+    public List<WarningMetricVO> warningMetrics(DashboardFilterRequest request) {
+        Integer deptId = dataScopeService.resolveRequestedDeptId(request.getDeptId(), request.getMajorId());
+        Integer majorId = dataScopeService.resolveRequestedMajorId(request.getMajorId());
+        DashboardOverviewVO overview = dashboardMapper.selectOverview(deptId, majorId, request.getYear());
+        DashboardOverviewVO safe = overview == null ? new DashboardOverviewVO() : overview;
+
+        List<IndicatorRuleEntity> rules =
+            indicatorRuleMapper.selectList(new QueryWrapper<IndicatorRuleEntity>().eq("deleted", 0).eq("enabled", 1));
+
+        List<WarningMetricVO> result = new ArrayList<>();
+        for (IndicatorRuleEntity rule : rules) {
+            WarningMetricVO vo = new WarningMetricVO();
+            vo.setIndicatorCode(rule.getIndicatorCode());
+            vo.setIndicatorName(rule.getIndicatorName());
+            vo.setCompareType(rule.getCompareType());
+            vo.setThresholdValue(rule.getThresholdValue());
+
+            BigDecimal actual = resolveActualMetricValue(rule.getIndicatorCode(), safe);
+            vo.setActualValue(actual);
+
+            String status = evaluate(rule.getCompareType(), actual, rule.getThresholdValue()) ? "PASS" : "WARN";
+            vo.setStatus(status);
+
+            vo.setAttainmentRate(calcAttainment(rule.getCompareType(), actual, rule.getThresholdValue()));
+            result.add(vo);
+        }
+
+        return result;
+    }
+
     private BigDecimal metricScore(BigDecimal metric, BigDecimal weight) {
         BigDecimal safeMetric = metric == null ? BigDecimal.ZERO : metric;
         BigDecimal safeWeight = weight == null ? BigDecimal.ZERO : weight;
         return safeMetric.multiply(safeWeight).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+    }
+
+    private BigDecimal resolveActualMetricValue(String indicatorCode, DashboardOverviewVO overview) {
+        if (IndicatorConstants.PHD_RATE.equals(indicatorCode)) {
+            return overview.getPhdRate();
+        }
+        if (IndicatorConstants.ADMISSION_COMPLETION_RATE.equals(indicatorCode)) {
+            return overview.getAdmissionCompletionRate();
+        }
+        if (IndicatorConstants.FUNDING_UTILIZATION_RATE.equals(indicatorCode)) {
+            return overview.getFundingUtilizationRate();
+        }
+        if (IndicatorConstants.EMPLOYMENT_RATE.equals(indicatorCode)) {
+            return overview.getEmploymentRate();
+        }
+        if (IndicatorConstants.POSTGRADUATE_RATE.equals(indicatorCode)) {
+            return overview.getPostgraduateRate();
+        }
+        return BigDecimal.ZERO;
+    }
+
+    private boolean evaluate(String compareType, BigDecimal actual, BigDecimal threshold) {
+        BigDecimal safeActual = actual == null ? BigDecimal.ZERO : actual;
+        BigDecimal safeThreshold = threshold == null ? BigDecimal.ZERO : threshold;
+        if ("GT".equalsIgnoreCase(compareType)) {
+            return safeActual.compareTo(safeThreshold) <= 0;
+        }
+        return safeActual.compareTo(safeThreshold) >= 0;
+    }
+
+    private BigDecimal calcAttainment(String compareType, BigDecimal actual, BigDecimal threshold) {
+        BigDecimal safeActual = actual == null ? BigDecimal.ZERO : actual;
+        BigDecimal safeThreshold = threshold == null ? BigDecimal.ZERO : threshold;
+        if (safeThreshold.compareTo(BigDecimal.ZERO) <= 0) {
+            return BigDecimal.ZERO;
+        }
+        if ("GT".equalsIgnoreCase(compareType)) {
+            if (safeActual.compareTo(BigDecimal.ZERO) <= 0) {
+                return BigDecimal.ZERO;
+            }
+            return safeThreshold.multiply(BigDecimal.valueOf(100)).divide(safeActual, 2, RoundingMode.HALF_UP);
+        }
+        return safeActual.multiply(BigDecimal.valueOf(100)).divide(safeThreshold, 2, RoundingMode.HALF_UP);
     }
 }

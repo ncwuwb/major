@@ -23,3 +23,7 @@ export function fetchScores(data) {
 export function recalculateWarnings() {
   return request({ url: '/dashboard/warnings/recalculate', method: 'post' })
 }
+
+export function fetchWarningMetrics(data) {
+  return request({ url: '/dashboard/warnings/metrics', method: 'post', data })
+}

@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -23,6 +23,7 @@ function joinPath(base, path) {
 function normalizeRoutes(routes, basePath = '') {
   return routes
     .filter((item) => canAccessRoute(authStore.roleCode, item))
+    .filter((item) => !item.meta?.hidden)
     .map((item) => {
       const fullPath = joinPath(basePath || '', item.path)
       const children = item.children ? normalizeRoutes(item.children, fullPath) : []

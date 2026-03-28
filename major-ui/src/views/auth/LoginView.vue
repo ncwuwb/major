@@ -40,38 +40,17 @@ async function handleLogin() {
 
 <template>
   <div class="login-view">
-    <div class="login-view__hero">
-      <div class="login-view__hero-card">
-        <el-tag type="success" effect="dark">高校专业数据资源监测平台</el-tag>
-        <h1>让答辩展示既有系统感，也有数据说服力</h1>
-        <p>
-          这个前端围绕“登录鉴权、基础主数据、年度业务数据、指标分析、预警与导入导出”构建，方便你在答辩时完整演示平台闭环。
-        </p>
-        <div class="login-view__points">
-          <div>
-            <strong>01</strong>
-            <span>统一后台框架</span>
-          </div>
-          <div>
-            <strong>02</strong>
-            <span>首页趋势与对比图</span>
-          </div>
-          <div>
-            <strong>03</strong>
-            <span>真实接口联调</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <div class="login-view__panel">
+      <div class="login-view__brand">
+        <div class="login-view__logo">M</div>
+        <h1>高校专业数据资源监测平台</h1>
+        <p class="muted">专业建设 · 数据监测 · 质量评估</p>
+      </div>
+
       <div class="page-card login-card">
-        <div class="section-title login-card__header">
-          <div>
-            <h2>登录系统</h2>
-            <p>默认已填入演示账号，可直接进入系统。</p>
-          </div>
-          <el-tag type="warning" effect="plain">Vue 3 + Spring Boot</el-tag>
+        <div class="login-card__header">
+          <h2>登录系统</h2>
+          <p class="muted">请输入账号密码进入系统</p>
         </div>
 
         <el-form ref="formRef" :model="form" :rules="rules" label-position="top" @keyup.enter="handleLogin">
@@ -88,12 +67,8 @@ async function handleLogin() {
 
         <div class="login-card__tips">
           <div>
-            <span class="muted">推荐演示账号</span>
+            <span class="muted">默认账号</span>
             <strong>admin / admin123456</strong>
-          </div>
-          <div>
-            <span class="muted">演示路径</span>
-            <strong>首页看板 → 数据管理 → 预警中心</strong>
           </div>
         </div>
       </div>
@@ -103,86 +78,79 @@ async function handleLogin() {
 
 <style scoped>
 .login-view {
-  display: grid;
-  min-height: 100vh;
-  grid-template-columns: 1.15fr 0.85fr;
-}
-
-.login-view__hero,
-.login-view__panel {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 40px;
-}
-
-.login-view__hero {
+  min-height: 100vh;
   background:
-    radial-gradient(circle at top left, rgba(15, 157, 138, 0.22), transparent 28%),
-    linear-gradient(135deg, #123740 0%, #0f5f6d 55%, #1b8d7c 100%);
+    radial-gradient(circle at 30% 20%, rgba(15, 157, 138, 0.08), transparent 40%),
+    radial-gradient(circle at 70% 80%, rgba(242, 155, 56, 0.06), transparent 40%),
+    var(--bg-page, #edf3f6);
+}
+
+.login-view__panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  padding: 40px 20px;
+  width: 100%;
+  max-width: 460px;
+}
+
+.login-view__brand {
+  text-align: center;
+}
+
+.login-view__logo {
+  display: inline-flex;
+  width: 56px;
+  height: 56px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+  background: linear-gradient(135deg, var(--brand-primary), var(--brand-accent));
   color: white;
+  font-size: 28px;
+  font-weight: 900;
+  box-shadow: 0 10px 24px rgba(15, 157, 138, 0.22);
+  margin-bottom: 18px;
 }
 
-.login-view__hero-card {
-  max-width: 560px;
-}
-
-.login-view__hero-card h1 {
-  margin: 22px 0 16px;
-  font-size: 48px;
-  line-height: 1.1;
-}
-
-.login-view__hero-card p {
+.login-view__brand h1 {
   margin: 0;
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 18px;
-  line-height: 1.7;
+  font-size: 24px;
+  letter-spacing: 0.04em;
 }
 
-.login-view__points {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
-  margin-top: 32px;
-}
-
-.login-view__points div {
-  padding: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.login-view__points strong,
-.login-view__points span {
-  display: block;
-}
-
-.login-view__points strong {
-  font-size: 22px;
-}
-
-.login-view__points span {
-  margin-top: 8px;
-  color: rgba(255, 255, 255, 0.82);
+.login-view__brand p {
+  margin: 8px 0 0;
 }
 
 .login-card {
-  width: min(100%, 500px);
+  width: 100%;
   padding: 28px;
 }
 
 .login-card__header {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+}
+
+.login-card__header h2 {
+  margin: 0 0 6px;
+  font-size: 20px;
+}
+
+.login-card__header p {
+  margin: 0;
 }
 
 .login-card__tips {
   display: grid;
   gap: 14px;
-  margin-top: 24px;
-  padding-top: 18px;
-  border-top: 1px dashed var(--line-strong);
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--line-soft);
 }
 
 .login-card__tips strong,
@@ -194,13 +162,13 @@ async function handleLogin() {
   margin-top: 4px;
 }
 
-@media (max-width: 1100px) {
-  .login-view {
-    grid-template-columns: 1fr;
+@media (max-width: 520px) {
+  .login-view__panel {
+    padding: 24px 16px;
   }
 
-  .login-view__hero {
-    min-height: 360px;
+  .login-card {
+    padding: 20px;
   }
 }
 </style>

@@ -63,4 +63,10 @@ public class DashboardController {
         dashboardService.recalculateWarnings();
         return ApiResponse.success();
     }
+
+    @Operation(tags = { "预警管理" }, summary = "获取预警指标概览", description = "返回当前筛选范围下的指标阈值与达标情况，用于大屏阈值仪表盘/雷达图。请求体可为空，空值时默认使用当前用户权限范围。")
+    @PostMapping("/warnings/metrics")
+    public ApiResponse<?> warningMetrics(@RequestBody(required = false) DashboardFilterRequest request) {
+        return ApiResponse.success(dashboardService.warningMetrics(request == null ? new DashboardFilterRequest() : request));
+    }
 }

@@ -34,6 +34,29 @@
              <if test="majorId == null and deptId != null">
                  AND t.dept_id = #{deptId}
              </if>) AS teacher_count,
+            (SELECT COUNT(*)
+             FROM course c
+             JOIN major m ON c.major_id = m.major_id AND m.deleted = 0
+             WHERE c.deleted = 0
+             <if test="majorId != null">
+                 AND c.major_id = #{majorId}
+             </if>
+             <if test="majorId == null and deptId != null">
+                 AND m.dept_id = #{deptId}
+             </if>) AS course_count,
+            (SELECT COUNT(*)
+             FROM achievement a
+             JOIN teacher t ON a.teacher_id = t.teacher_id AND t.deleted = 0
+             WHERE a.deleted = 0
+             <if test="year != null">
+                 AND a.stat_year = #{year}
+             </if>
+             <if test="majorId != null">
+                 AND t.dept_id = (SELECT dept_id FROM major WHERE major_id = #{majorId} AND deleted = 0)
+             </if>
+             <if test="majorId == null and deptId != null">
+                 AND t.dept_id = #{deptId}
+             </if>) AS achievement_count,
             (SELECT IFNULL(ROUND((SUM(CASE WHEN t.phd_flag = 1 THEN 1 ELSE 0 END) / NULLIF(COUNT(*), 0)) * 100, 2), 0)
              FROM teacher t
              WHERE t.deleted = 0
@@ -56,6 +79,32 @@
              <if test="majorId == null and deptId != null">
                  AND m.dept_id = #{deptId}
              </if>) AS admission_completion_rate,
+            (SELECT IFNULL(SUM(a.plan_count), 0)
+             FROM admission a
+             JOIN major m ON a.major_id = m.major_id AND m.deleted = 0
+             WHERE a.deleted = 0
+             <if test="year != null">
+                 AND a.stat_year = #{year}
+             </if>
+             <if test="majorId != null">
+                 AND a.major_id = #{majorId}
+             </if>
+             <if test="majorId == null and deptId != null">
+                 AND m.dept_id = #{deptId}
+             </if>) AS admission_plan_total,
+            (SELECT IFNULL(SUM(a.actual_count), 0)
+             FROM admission a
+             JOIN major m ON a.major_id = m.major_id AND m.deleted = 0
+             WHERE a.deleted = 0
+             <if test="year != null">
+                 AND a.stat_year = #{year}
+             </if>
+             <if test="majorId != null">
+                 AND a.major_id = #{majorId}
+             </if>
+             <if test="majorId == null and deptId != null">
+                 AND m.dept_id = #{deptId}
+             </if>) AS admission_actual_total,
             (SELECT IFNULL(ROUND(SUM(IFNULL(f.spent, 0)) / NULLIF(SUM(IFNULL(f.allocated, 0)), 0) * 100, 2), 0)
              FROM funding f
              JOIN major m ON f.major_id = m.major_id AND m.deleted = 0
@@ -69,6 +118,32 @@
              <if test="majorId == null and deptId != null">
                  AND m.dept_id = #{deptId}
              </if>) AS funding_utilization_rate,
+            (SELECT IFNULL(SUM(IFNULL(f.allocated, 0)), 0)
+             FROM funding f
+             JOIN major m ON f.major_id = m.major_id AND m.deleted = 0
+             WHERE f.deleted = 0
+             <if test="year != null">
+                 AND f.stat_year = #{year}
+             </if>
+             <if test="majorId != null">
+                 AND f.major_id = #{majorId}
+             </if>
+             <if test="majorId == null and deptId != null">
+                 AND m.dept_id = #{deptId}
+             </if>) AS funding_allocated_total,
+            (SELECT IFNULL(SUM(IFNULL(f.spent, 0)), 0)
+             FROM funding f
+             JOIN major m ON f.major_id = m.major_id AND m.deleted = 0
+             WHERE f.deleted = 0
+             <if test="year != null">
+                 AND f.stat_year = #{year}
+             </if>
+             <if test="majorId != null">
+                 AND f.major_id = #{majorId}
+             </if>
+             <if test="majorId == null and deptId != null">
+                 AND m.dept_id = #{deptId}
+             </if>) AS funding_spent_total,
             (SELECT COUNT(*)
              FROM competition c
              JOIN student s ON c.student_id = s.student_id AND s.deleted = 0
@@ -108,11 +183,130 @@
              </if>
              <if test="majorId == null and deptId != null">
                  AND m.dept_id = #{deptId}
-             </if>) AS postgraduate_rate
+             </if>) AS postgraduate_rate,
+            (SELECT IFNULL(ROUND(SUM(go.average_salary * go.graduate_count) / NULLIF(SUM(go.graduate_count), 0), 2), 0)
+             FROM graduate_outcome go
+             JOIN major m ON go.major_id = m.major_id AND m.deleted = 0
+             WHERE go.deleted = 0
+             <if test="year != null">
+                 AND go.stat_year = #{year}
+             </if>
+             <if test="majorId != null">
+                 AND go.major_id = #{majorId}
+             </if>
+             <if test="majorId == null and deptId != null">
+                 AND m.dept_id = #{deptId}
+             </if>) AS average_salary
     </select>
 
     <select id="selectTrend" resultType="com.major.domain.vo.DashboardTrendPointVO">
         <choose>
+            <when test='metric == "ACHIEVEMENT_COUNT"'>
+                SELECT a.stat_year, COUNT(*) AS metric_value
+                FROM achievement a
+                JOIN teacher t ON a.teacher_id = t.teacher_id AND t.deleted = 0
+                WHERE a.deleted = 0
+                  AND a.stat_year BETWEEN #{startYear} AND #{endYear}
+                <if test="majorId != null">
+                    AND t.dept_id = (SELECT dept_id FROM major WHERE major_id = #{majorId} AND deleted = 0)
+                </if>
+                <if test="majorId == null and deptId != null">
+                    AND t.dept_id = #{deptId}
+                </if>
+                GROUP BY a.stat_year
+                ORDER BY a.stat_year
+            </when>
+            <when test='metric == "COMPETITION_COUNT"'>
+                SELECT c.stat_year, COUNT(*) AS metric_value
+                FROM competition c
+                JOIN student s ON c.student_id = s.student_id AND s.deleted = 0
+                JOIN major m ON s.major_id = m.major_id AND m.deleted = 0
+                WHERE c.deleted = 0
+                  AND c.stat_year BETWEEN #{startYear} AND #{endYear}
+                <if test="majorId != null">
+                    AND s.major_id = #{majorId}
+                </if>
+                <if test="majorId == null and deptId != null">
+                    AND m.dept_id = #{deptId}
+                </if>
+                GROUP BY c.stat_year
+                ORDER BY c.stat_year
+            </when>
+            <when test='metric == "AVERAGE_SALARY"'>
+                SELECT go.stat_year, IFNULL(ROUND(SUM(go.average_salary * go.graduate_count) / NULLIF(SUM(go.graduate_count), 0), 2), 0) AS metric_value
+                FROM graduate_outcome go
+                JOIN major m ON go.major_id = m.major_id AND m.deleted = 0
+                WHERE go.deleted = 0
+                  AND go.stat_year BETWEEN #{startYear} AND #{endYear}
+                <if test="majorId != null">
+                    AND go.major_id = #{majorId}
+                </if>
+                <if test="majorId == null and deptId != null">
+                    AND m.dept_id = #{deptId}
+                </if>
+                GROUP BY go.stat_year
+                ORDER BY go.stat_year
+            </when>
+            <when test='metric == "ADMISSION_PLAN_TOTAL"'>
+                SELECT a.stat_year, IFNULL(SUM(a.plan_count), 0) AS metric_value
+                FROM admission a
+                JOIN major m ON a.major_id = m.major_id AND m.deleted = 0
+                WHERE a.deleted = 0
+                  AND a.stat_year BETWEEN #{startYear} AND #{endYear}
+                <if test="majorId != null">
+                    AND a.major_id = #{majorId}
+                </if>
+                <if test="majorId == null and deptId != null">
+                    AND m.dept_id = #{deptId}
+                </if>
+                GROUP BY a.stat_year
+                ORDER BY a.stat_year
+            </when>
+            <when test='metric == "ADMISSION_ACTUAL_TOTAL"'>
+                SELECT a.stat_year, IFNULL(SUM(a.actual_count), 0) AS metric_value
+                FROM admission a
+                JOIN major m ON a.major_id = m.major_id AND m.deleted = 0
+                WHERE a.deleted = 0
+                  AND a.stat_year BETWEEN #{startYear} AND #{endYear}
+                <if test="majorId != null">
+                    AND a.major_id = #{majorId}
+                </if>
+                <if test="majorId == null and deptId != null">
+                    AND m.dept_id = #{deptId}
+                </if>
+                GROUP BY a.stat_year
+                ORDER BY a.stat_year
+            </when>
+            <when test='metric == "FUNDING_ALLOCATED_TOTAL"'>
+                SELECT f.stat_year, IFNULL(SUM(IFNULL(f.allocated, 0)), 0) AS metric_value
+                FROM funding f
+                JOIN major m ON f.major_id = m.major_id AND m.deleted = 0
+                WHERE f.deleted = 0
+                  AND f.stat_year BETWEEN #{startYear} AND #{endYear}
+                <if test="majorId != null">
+                    AND f.major_id = #{majorId}
+                </if>
+                <if test="majorId == null and deptId != null">
+                    AND m.dept_id = #{deptId}
+                </if>
+                GROUP BY f.stat_year
+                ORDER BY f.stat_year
+            </when>
+            <when test='metric == "FUNDING_SPENT_TOTAL"'>
+                SELECT f.stat_year, IFNULL(SUM(IFNULL(f.spent, 0)), 0) AS metric_value
+                FROM funding f
+                JOIN major m ON f.major_id = m.major_id AND m.deleted = 0
+                WHERE f.deleted = 0
+                  AND f.stat_year BETWEEN #{startYear} AND #{endYear}
+                <if test="majorId != null">
+                    AND f.major_id = #{majorId}
+                </if>
+                <if test="majorId == null and deptId != null">
+                    AND m.dept_id = #{deptId}
+                </if>
+                GROUP BY f.stat_year
+                ORDER BY f.stat_year
+            </when>
             <when test='metric == "ADMISSION_COMPLETION_RATE"'>
                 SELECT a.stat_year, IFNULL(ROUND(SUM(a.actual_count) / NULLIF(SUM(a.plan_count), 0) * 100, 2), 0) AS metric_value
                 FROM admission a
@@ -194,6 +388,111 @@
 
     <select id="selectRank" resultType="com.major.domain.vo.DashboardRankVO">
         <choose>
+            <when test='metric == "STUDENT_COUNT"'>
+                SELECT m.major_id, m.name AS major_name, IFNULL(COUNT(s.student_id), 0) AS metric_value
+                FROM major m
+                LEFT JOIN student s ON m.major_id = s.major_id AND s.deleted = 0
+                WHERE m.deleted = 0
+                <if test="deptId != null">
+                    AND m.dept_id = #{deptId}
+                </if>
+                GROUP BY m.major_id, m.name
+                ORDER BY metric_value DESC
+                LIMIT #{limit}
+            </when>
+            <when test='metric == "TEACHER_COUNT"'>
+                SELECT m.major_id, m.name AS major_name,
+                       IFNULL((SELECT COUNT(*) FROM teacher t WHERE t.deleted = 0 AND t.dept_id = m.dept_id), 0) AS metric_value
+                FROM major m
+                WHERE m.deleted = 0
+                <if test="deptId != null">
+                    AND m.dept_id = #{deptId}
+                </if>
+                ORDER BY metric_value DESC
+                LIMIT #{limit}
+            </when>
+            <when test='metric == "ADMISSION_ACTUAL_TOTAL"'>
+                SELECT m.major_id, m.name AS major_name, IFNULL(a.actual_count, 0) AS metric_value
+                FROM major m
+                LEFT JOIN admission a ON m.major_id = a.major_id AND a.deleted = 0 AND a.stat_year = #{year}
+                WHERE m.deleted = 0
+                <if test="deptId != null">
+                    AND m.dept_id = #{deptId}
+                </if>
+                ORDER BY metric_value DESC
+                LIMIT #{limit}
+            </when>
+            <when test='metric == "FUNDING_SPENT_TOTAL"'>
+                SELECT m.major_id, m.name AS major_name, IFNULL(f.spent, 0) AS metric_value
+                FROM major m
+                LEFT JOIN funding f ON m.major_id = f.major_id AND f.deleted = 0 AND f.stat_year = #{year}
+                WHERE m.deleted = 0
+                <if test="deptId != null">
+                    AND m.dept_id = #{deptId}
+                </if>
+                ORDER BY metric_value DESC
+                LIMIT #{limit}
+            </when>
+            <when test='metric == "FUNDING_ALLOCATED_TOTAL"'>
+                SELECT m.major_id, m.name AS major_name, IFNULL(f.allocated, 0) AS metric_value
+                FROM major m
+                LEFT JOIN funding f ON m.major_id = f.major_id AND f.deleted = 0 AND f.stat_year = #{year}
+                WHERE m.deleted = 0
+                <if test="deptId != null">
+                    AND m.dept_id = #{deptId}
+                </if>
+                ORDER BY metric_value DESC
+                LIMIT #{limit}
+            </when>
+            <when test='metric == "COURSE_COUNT"'>
+                SELECT m.major_id, m.name AS major_name, IFNULL(COUNT(c.course_id), 0) AS metric_value
+                FROM major m
+                LEFT JOIN course c ON m.major_id = c.major_id AND c.deleted = 0
+                WHERE m.deleted = 0
+                <if test="deptId != null">
+                    AND m.dept_id = #{deptId}
+                </if>
+                GROUP BY m.major_id, m.name
+                ORDER BY metric_value DESC
+                LIMIT #{limit}
+            </when>
+            <when test='metric == "ACHIEVEMENT_COUNT"'>
+                SELECT m.major_id, m.name AS major_name, IFNULL(COUNT(a.achievement_id), 0) AS metric_value
+                FROM major m
+                LEFT JOIN teacher t ON m.dept_id = t.dept_id AND t.deleted = 0
+                LEFT JOIN achievement a ON t.teacher_id = a.teacher_id AND a.deleted = 0 AND a.stat_year = #{year}
+                WHERE m.deleted = 0
+                <if test="deptId != null">
+                    AND m.dept_id = #{deptId}
+                </if>
+                GROUP BY m.major_id, m.name
+                ORDER BY metric_value DESC
+                LIMIT #{limit}
+            </when>
+            <when test='metric == "COMPETITION_COUNT"'>
+                SELECT m.major_id, m.name AS major_name, IFNULL(COUNT(c.competition_id), 0) AS metric_value
+                FROM major m
+                LEFT JOIN student s ON m.major_id = s.major_id AND s.deleted = 0
+                LEFT JOIN competition c ON s.student_id = c.student_id AND c.deleted = 0 AND c.stat_year = #{year}
+                WHERE m.deleted = 0
+                <if test="deptId != null">
+                    AND m.dept_id = #{deptId}
+                </if>
+                GROUP BY m.major_id, m.name
+                ORDER BY metric_value DESC
+                LIMIT #{limit}
+            </when>
+            <when test='metric == "AVERAGE_SALARY"'>
+                SELECT m.major_id, m.name AS major_name, IFNULL(go.average_salary, 0) AS metric_value
+                FROM major m
+                LEFT JOIN graduate_outcome go ON m.major_id = go.major_id AND go.deleted = 0 AND go.stat_year = #{year}
+                WHERE m.deleted = 0
+                <if test="deptId != null">
+                    AND m.dept_id = #{deptId}
+                </if>
+                ORDER BY metric_value DESC
+                LIMIT #{limit}
+            </when>
             <when test='metric == "PHD_RATE"'>
                 SELECT m.major_id, m.name AS major_name,
                        IFNULL(ROUND((SELECT SUM(CASE WHEN t.phd_flag = 1 THEN 1 ELSE 0 END) / NULLIF(COUNT(*), 0) * 100

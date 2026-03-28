@@ -1,8 +1,8 @@
-﻿import AppLayout from '@/layout/AppLayout.vue'
+import AppLayout from '@/layout/AppLayout.vue'
 import RouteGroup from '@/layout/RouteGroup.vue'
 import { ROLE_CODES } from '@/constants/roles'
 
-const DashboardView = () => import('@/views/dashboard/DashboardView.vue')
+const BigScreenView = () => import('@/views/dashboard/BigScreenView.vue')
 const LoginView = () => import('@/views/auth/LoginView.vue')
 const ResourceCrudView = () => import('@/views/crud/ResourceCrudView.vue')
 const WarningView = () => import('@/views/system/WarningView.vue')
@@ -13,11 +13,23 @@ export const appRoutes = [
   {
     path: '/dashboard',
     name: 'Dashboard',
-    component: DashboardView,
+    component: BigScreenView,
     meta: {
       title: '首页看板',
       icon: 'DataBoard',
       roles: [ROLE_CODES.SCHOOL_ADMIN, ROLE_CODES.DEPT_ADMIN, ROLE_CODES.MAJOR_ADMIN],
+    },
+  },
+  {
+    path: '/bigscreen',
+    name: 'BigScreenFullScreen',
+    component: BigScreenView,
+    meta: {
+      title: '可视化大屏（全屏）',
+      icon: 'DataBoard',
+      roles: [ROLE_CODES.SCHOOL_ADMIN, ROLE_CODES.DEPT_ADMIN, ROLE_CODES.MAJOR_ADMIN],
+      fullscreen: true,
+      hidden: true,
     },
   },
   {

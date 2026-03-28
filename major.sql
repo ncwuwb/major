@@ -11,7 +11,7 @@
  Target Server Version : 80026 (8.0.26)
  File Encoding         : 65001
 
- Date: 28/03/2026 12:44:22
+ Date: 20/03/2026 10:26:36
 */
 
 SET NAMES utf8mb4;
@@ -403,7 +403,7 @@ CREATE TABLE `experimentbase`  (
   PRIMARY KEY (`base_id`) USING BTREE,
   INDEX `major_id`(`major_id` ASC) USING BTREE,
   CONSTRAINT `experimentbase_ibfk_1` FOREIGN KEY (`major_id`) REFERENCES `major` (`major_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '专业实验与实训基地表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '专业实验与实训基地表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of experimentbase
@@ -628,7 +628,7 @@ CREATE TABLE `internationalexchange`  (
   PRIMARY KEY (`exchange_id`) USING BTREE,
   INDEX `student_id`(`student_id` ASC) USING BTREE,
   CONSTRAINT `internationalexchange_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `student` (`student_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '学生国际交流信息表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '学生国际交流信息表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of internationalexchange
@@ -685,16 +685,11 @@ CREATE TABLE `operation_log`  (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `deleted` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`log_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '操作日志表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '操作日志表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of operation_log
 -- ----------------------------
-INSERT INTO `operation_log` VALUES (1, 1, 'admin', '用户管理', '新增用户', 'POST', '/api/users', '{\"username\":\"hlxy\",\"realName\":\"护理学院\",\"phone\":\"13938549908\",\"email\":\"12345@163.com\",\"roleCode\":\"DEPT_ADMIN\",\"scopeType\":\"DEPT\",\"scopeId\":1,\"status\":1}', 0, 'rawPassword cannot be null', '2026-03-20 11:34:40', 0);
-INSERT INTO `operation_log` VALUES (2, 1, 'admin', '用户管理', '新增用户', 'POST', '/api/users', '{\"username\":\"hlxy\",\"realName\":\"护理学院\",\"phone\":\"13938549908\",\"email\":\"12345@163.com\",\"roleCode\":\"DEPT_ADMIN\",\"scopeType\":\"DEPT\",\"scopeId\":1,\"status\":1}', 0, 'rawPassword cannot be null', '2026-03-20 11:34:46', 0);
-INSERT INTO `operation_log` VALUES (3, 1, 'admin', '用户管理', '新增用户', 'POST', '/api/users', '{\"username\":\"hlxy\",\"realName\":\"护理学院\",\"phone\":\"13938549908\",\"email\":\"12345@163.com\",\"roleCode\":\"DEPT_ADMIN\",\"scopeType\":\"DEPT\",\"scopeId\":1,\"status\":1}', 0, 'rawPassword cannot be null', '2026-03-20 11:35:05', 0);
-INSERT INTO `operation_log` VALUES (4, 1, 'admin', '用户管理', '新增用户', 'POST', '/api/users', '{\"username\":\"hlxy\",\"realName\":\"护理学院\",\"phone\":\"13938549908\",\"email\":\"12345@163.com\",\"roleCode\":\"DEPT_ADMIN\",\"scopeType\":\"DEPT\",\"scopeId\":1,\"status\":1}', 0, 'rawPassword cannot be null', '2026-03-20 11:35:16', 0);
-INSERT INTO `operation_log` VALUES (5, 1, 'admin', '用户管理', '新增用户', 'POST', '/api/users', '{\"username\":\"hlxy\",\"realName\":\"护理学院\",\"phone\":\"13938549908\",\"email\":\"12345@163.com\",\"roleCode\":\"DEPT_ADMIN\",\"scopeType\":\"DEPT\",\"scopeId\":1,\"status\":1}', 1, NULL, '2026-03-20 11:37:29', 0);
 
 -- ----------------------------
 -- Table structure for report_template
@@ -748,7 +743,7 @@ CREATE TABLE `researchachievement`  (
   PRIMARY KEY (`achievement_id`) USING BTREE,
   INDEX `teacher_id`(`teacher_id` ASC) USING BTREE,
   CONSTRAINT `researchachievement_ibfk_1` FOREIGN KEY (`teacher_id`) REFERENCES `teacher` (`teacher_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '教师科研成果表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '教师科研成果表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of researchachievement
@@ -900,13 +895,12 @@ CREATE TABLE `sys_user`  (
   `deleted` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`user_id`) USING BTREE,
   UNIQUE INDEX `uk_sys_user_username`(`username` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '系统用户表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '系统用户表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sys_user
 -- ----------------------------
-INSERT INTO `sys_user` VALUES (1, 'admin', '{bcrypt}$2a$10$aX9pFSMWNvBKq1e2gxfc2ODqSN9AsuxhGUzDWyWawjBvCwShpjiTa', '系统管理员', NULL, NULL, 'SCHOOL_ADMIN', 'SCHOOL', 1, 1, '2026-03-20 10:52:44', '2026-03-11 17:47:22', '2026-03-11 17:47:22', 0);
-INSERT INTO `sys_user` VALUES (2, 'hlxy', '{bcrypt}$2a$10$gIYYXolclXdPo5VQBqluouTKZ6EmYN8S48nmYkHtd43N4RActJuj2', '护理学院', '13938549908', '12345@163.com', 'DEPT_ADMIN', 'DEPT', 1, 1, '2026-03-20 11:37:55', '2026-03-20 11:37:30', '2026-03-20 11:37:30', 0);
+INSERT INTO `sys_user` VALUES (1, 'admin', '{bcrypt}$2a$10$aX9pFSMWNvBKq1e2gxfc2ODqSN9AsuxhGUzDWyWawjBvCwShpjiTa', '系统管理员', NULL, NULL, 'SCHOOL_ADMIN', 'SCHOOL', 1, 1, '2026-03-20 09:53:53', '2026-03-11 17:47:22', '2026-03-11 17:47:22', 0);
 
 -- ----------------------------
 -- Table structure for teacher
