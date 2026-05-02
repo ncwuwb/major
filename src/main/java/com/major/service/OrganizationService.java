@@ -31,6 +31,7 @@ import com.major.mapper.StudentMapper;
 import com.major.mapper.SysUserMapper;
 import com.major.mapper.TeacherMapper;
 import java.util.Objects;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -96,11 +97,13 @@ public class OrganizationService {
         return entity;
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void saveSchool(SchoolEntity entity) {
         ensureSchoolCodeUnique(entity.getCode(), null);
         schoolMapper.insert(entity);
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void updateSchool(Integer schoolId, SchoolEntity entity) {
         getSchool(schoolId);
         ensureSchoolCodeUnique(entity.getCode(), schoolId);
@@ -108,6 +111,7 @@ public class OrganizationService {
         schoolMapper.updateById(entity);
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void deleteSchool(Integer schoolId) {
         getSchool(schoolId);
         if (campusMapper.selectCount(new QueryWrapper<CampusEntity>().eq("school_id", schoolId).eq("deleted", 0)) > 0
@@ -135,11 +139,13 @@ public class OrganizationService {
         return entity;
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void saveCampus(CampusEntity entity) {
         getSchool(entity.getSchoolId());
         campusMapper.insert(entity);
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void updateCampus(Integer campusId, CampusEntity entity) {
         getCampus(campusId);
         getSchool(entity.getSchoolId());
@@ -147,6 +153,7 @@ public class OrganizationService {
         campusMapper.updateById(entity);
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void deleteCampus(Integer campusId) {
         getCampus(campusId);
         campusMapper.deleteById(campusId);
@@ -169,12 +176,14 @@ public class OrganizationService {
         return entity;
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void saveDepartment(DepartmentEntity entity) {
         getSchool(entity.getSchoolId());
         ensureDepartmentCodeUnique(entity.getCode(), null);
         departmentMapper.insert(entity);
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void updateDepartment(Integer deptId, DepartmentEntity entity) {
         getDepartment(deptId);
         getSchool(entity.getSchoolId());
@@ -183,6 +192,7 @@ public class OrganizationService {
         departmentMapper.updateById(entity);
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void deleteDepartment(Integer deptId) {
         getDepartment(deptId);
         if (majorMapper.selectCount(new QueryWrapper<MajorEntity>().eq("dept_id", deptId).eq("deleted", 0)) > 0
@@ -214,6 +224,7 @@ public class OrganizationService {
         return entity;
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void saveMajor(MajorEntity entity) {
         dataScopeService.assertCanAccessDept(entity.getDeptId());
         referenceAssertService.requireDepartment(entity.getDeptId());
@@ -221,6 +232,7 @@ public class OrganizationService {
         majorMapper.insert(entity);
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void updateMajor(Integer majorId, MajorEntity entity) {
         getMajor(majorId);
         dataScopeService.assertCanAccessDept(entity.getDeptId());
@@ -230,6 +242,7 @@ public class OrganizationService {
         majorMapper.updateById(entity);
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void deleteMajor(Integer majorId) {
         getMajor(majorId);
         boolean hasLinkedData = sysUserMapper.selectCount(new QueryWrapper<SysUserEntity>().eq("scope_type", "MAJOR").eq("scope_id", majorId).eq("deleted", 0)) > 0
@@ -263,6 +276,7 @@ public class OrganizationService {
         return entity;
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void saveUser(SysUserEntity entity) {
         ensureUsernameUnique(entity.getUsername(), null);
         validateUserScope(entity.getScopeType(), entity.getScopeId());
@@ -273,6 +287,7 @@ public class OrganizationService {
         sysUserMapper.insert(entity);
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void updateUser(Long userId, SysUserEntity entity) {
         SysUserEntity existing = getUser(userId);
         ensureUsernameUnique(entity.getUsername(), userId);
@@ -289,6 +304,7 @@ public class OrganizationService {
         sysUserMapper.updateById(entity);
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void deleteUser(Long userId) {
         getUser(userId);
         sysUserMapper.deleteById(userId);

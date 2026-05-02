@@ -20,6 +20,7 @@ import com.major.mapper.CompetitionMapper;
 import com.major.mapper.FundingMapper;
 import com.major.mapper.GraduateOutcomeMapper;
 import com.major.mapper.InternationalExchangeMapper;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -78,6 +79,7 @@ public class AnnualDataService {
         return entity;
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void saveAdmission(AdmissionEntity entity) {
         dataScopeService.assertCanAccessMajor(entity.getMajorId());
         referenceAssertService.requireMajor(entity.getMajorId());
@@ -88,6 +90,7 @@ public class AnnualDataService {
         warningService.recalculateByMajorAndYear(entity.getMajorId(), entity.getStatYear());
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void updateAdmission(Integer id, AdmissionEntity entity) {
         AdmissionEntity existing = getAdmission(id);
         dataScopeService.assertCanAccessMajor(entity.getMajorId());
@@ -101,6 +104,7 @@ public class AnnualDataService {
         warningService.recalculateByMajorAndYear(entity.getMajorId(), entity.getStatYear());
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void deleteAdmission(Integer id) {
         AdmissionEntity entity = getAdmission(id);
         admissionMapper.deleteById(id);
@@ -132,6 +136,7 @@ public class AnnualDataService {
         return entity;
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void saveFunding(FundingEntity entity) {
         dataScopeService.assertCanAccessMajor(entity.getMajorId());
         referenceAssertService.requireMajor(entity.getMajorId());
@@ -142,6 +147,7 @@ public class AnnualDataService {
         warningService.recalculateByMajorAndYear(entity.getMajorId(), entity.getStatYear());
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void updateFunding(Integer id, FundingEntity entity) {
         FundingEntity existing = getFunding(id);
         dataScopeService.assertCanAccessMajor(entity.getMajorId());
@@ -155,6 +161,7 @@ public class AnnualDataService {
         warningService.recalculateByMajorAndYear(entity.getMajorId(), entity.getStatYear());
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void deleteFunding(Integer id) {
         FundingEntity entity = getFunding(id);
         fundingMapper.deleteById(id);
@@ -186,6 +193,7 @@ public class AnnualDataService {
         return entity;
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void saveGraduateOutcome(GraduateOutcomeEntity entity) {
         dataScopeService.assertCanAccessMajor(entity.getMajorId());
         referenceAssertService.requireMajor(entity.getMajorId());
@@ -196,6 +204,7 @@ public class AnnualDataService {
         warningService.recalculateByMajorAndYear(entity.getMajorId(), entity.getStatYear());
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void updateGraduateOutcome(Integer id, GraduateOutcomeEntity entity) {
         GraduateOutcomeEntity existing = getGraduateOutcome(id);
         dataScopeService.assertCanAccessMajor(entity.getMajorId());
@@ -209,6 +218,7 @@ public class AnnualDataService {
         warningService.recalculateByMajorAndYear(entity.getMajorId(), entity.getStatYear());
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void deleteGraduateOutcome(Integer id) {
         GraduateOutcomeEntity entity = getGraduateOutcome(id);
         graduateOutcomeMapper.deleteById(id);
@@ -247,12 +257,14 @@ public class AnnualDataService {
         return entity;
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void saveAchievement(AchievementEntity entity) {
         TeacherEntity teacher = referenceAssertService.requireTeacher(entity.getTeacherId());
         dataScopeService.assertCanAccessDept(teacher.getDeptId());
         achievementMapper.insert(entity);
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void updateAchievement(Integer id, AchievementEntity entity) {
         getAchievement(id);
         TeacherEntity teacher = referenceAssertService.requireTeacher(entity.getTeacherId());
@@ -261,6 +273,7 @@ public class AnnualDataService {
         achievementMapper.updateById(entity);
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void deleteAchievement(Integer id) {
         getAchievement(id);
         achievementMapper.deleteById(id);
@@ -295,12 +308,14 @@ public class AnnualDataService {
         return entity;
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void saveCompetition(CompetitionEntity entity) {
         StudentEntity student = referenceAssertService.requireStudent(entity.getStudentId());
         dataScopeService.assertCanAccessMajor(student.getMajorId());
         competitionMapper.insert(entity);
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void updateCompetition(Integer id, CompetitionEntity entity) {
         getCompetition(id);
         StudentEntity student = referenceAssertService.requireStudent(entity.getStudentId());
@@ -309,6 +324,7 @@ public class AnnualDataService {
         competitionMapper.updateById(entity);
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void deleteCompetition(Integer id) {
         getCompetition(id);
         competitionMapper.deleteById(id);
@@ -345,12 +361,14 @@ public class AnnualDataService {
         return entity;
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void saveInternationalExchange(InternationalExchangeEntity entity) {
         StudentEntity student = referenceAssertService.requireStudent(entity.getStudentId());
         dataScopeService.assertCanAccessMajor(student.getMajorId());
         internationalExchangeMapper.insert(entity);
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void updateInternationalExchange(Integer id, InternationalExchangeEntity entity) {
         getInternationalExchange(id);
         StudentEntity student = referenceAssertService.requireStudent(entity.getStudentId());
@@ -359,6 +377,7 @@ public class AnnualDataService {
         internationalExchangeMapper.updateById(entity);
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void deleteInternationalExchange(Integer id) {
         getInternationalExchange(id);
         internationalExchangeMapper.deleteById(id);

@@ -29,7 +29,7 @@ public class DashboardController {
     @Operation(tags = { "监测分析" }, summary = "获取监测概览", description = "返回当前数据范围下的核心概览指标。请求体可为空，空值时默认使用当前用户权限范围。")
     @PostMapping("/overview")
     public ApiResponse<?> overview(@RequestBody(required = false) DashboardFilterRequest request) {
-        return ApiResponse.success(dashboardService.overview(request == null ? new DashboardFilterRequest() : request));
+        return ApiResponse.success(dashboardService.overview(request));
     }
 
     @Operation(tags = { "监测分析" }, summary = "获取趋势分析", description = "根据指标编码和年份区间返回趋势变化数据。")
@@ -47,13 +47,13 @@ public class DashboardController {
     @Operation(tags = { "预警管理" }, summary = "查询预警列表", description = "返回当前筛选范围下的预警记录。请求体可为空，空值时默认使用当前用户权限范围。")
     @PostMapping("/warnings")
     public ApiResponse<?> warnings(@RequestBody(required = false) DashboardFilterRequest request) {
-        return ApiResponse.success(dashboardService.warnings(request == null ? new DashboardFilterRequest() : request));
+        return ApiResponse.success(dashboardService.warnings(request));
     }
 
     @Operation(tags = { "监测分析" }, summary = "计算综合评分", description = "返回综合评分结果和指标贡献。请求体可为空，空值时默认使用当前用户权限范围。")
     @PostMapping("/score")
     public ApiResponse<?> score(@RequestBody(required = false) DashboardFilterRequest request) {
-        return ApiResponse.success(dashboardService.score(request == null ? new DashboardFilterRequest() : request));
+        return ApiResponse.success(dashboardService.score(request));
     }
 
     @Operation(tags = { "预警管理" }, summary = "重算预警结果", description = "触发全量预警重算，仅 SCHOOL_ADMIN 可操作。")
@@ -67,6 +67,14 @@ public class DashboardController {
     @Operation(tags = { "预警管理" }, summary = "获取预警指标概览", description = "返回当前筛选范围下的指标阈值与达标情况，用于大屏阈值仪表盘/雷达图。请求体可为空，空值时默认使用当前用户权限范围。")
     @PostMapping("/warnings/metrics")
     public ApiResponse<?> warningMetrics(@RequestBody(required = false) DashboardFilterRequest request) {
-        return ApiResponse.success(dashboardService.warningMetrics(request == null ? new DashboardFilterRequest() : request));
+        return ApiResponse.success(dashboardService.warningMetrics(request));
+    }
+
+    @Operation(tags = { "监测分析" }, summary = "首页缓存预热", description = "预先加载首页常用查询结果到 Redis，减少首次访问首页的数据库压力。")
+    @PostMapping("/warmup")
+    @PreAuthorize("hasAuthority('SCHOOL_ADMIN')")
+    public ApiResponse<Void> warmup(@RequestBody(required = false) DashboardFilterRequest request) {
+        dashboardService.warmupDashboardCache(request);
+        return ApiResponse.success();
     }
 }

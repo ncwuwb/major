@@ -12,8 +12,15 @@ import com.major.domain.vo.DashboardScoreVO;
 import com.major.domain.vo.DashboardTrendPointVO;
 import com.major.domain.vo.WarningDetailVO;
 import com.major.domain.vo.WarningMetricVO;
+import com.major.domain.entity.DepartmentEntity;
+import com.major.domain.entity.MajorEntity;
+import com.major.domain.entity.StudentEntity;
 import com.major.mapper.DashboardMapper;
+import com.major.mapper.DepartmentMapper;
 import com.major.mapper.IndicatorRuleMapper;
+import com.major.mapper.MajorMapper;
+import com.major.mapper.StudentMapper;
+import com.major.common.util.CacheKeyUtils;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -21,6 +28,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -30,20 +40,31 @@ public class DashboardService {
     private final IndicatorRuleMapper indicatorRuleMapper;
     private final DataScopeService dataScopeService;
     private final WarningService warningService;
+    private final DepartmentMapper departmentMapper;
+    private final MajorMapper majorMapper;
+    private final StudentMapper studentMapper;
+    private final CacheManager cacheManager;
 
     public DashboardService(DashboardMapper dashboardMapper, IndicatorRuleMapper indicatorRuleMapper,
-                            DataScopeService dataScopeService, WarningService warningService) {
+                            DataScopeService dataScopeService, WarningService warningService,
+                            DepartmentMapper departmentMapper, MajorMapper majorMapper,
+                            StudentMapper studentMapper, CacheManager cacheManager) {
         this.dashboardMapper = dashboardMapper;
         this.indicatorRuleMapper = indicatorRuleMapper;
         this.dataScopeService = dataScopeService;
         this.warningService = warningService;
+        this.departmentMapper = departmentMapper;
+        this.majorMapper = majorMapper;
+        this.studentMapper = studentMapper;
+        this.cacheManager = cacheManager;
     }
 
+    @Cacheable(cacheNames = "dashboard:overview", key = "T(com.major.common.util.CacheKeyUtils).dashboardOverviewKey(#request.deptId, #request.majorId, #request.year)")
     public DashboardOverviewVO overview(DashboardFilterRequest request) {
-        Integer deptId = dataScopeService.resolveRequestedDeptId(request.getDeptId(), request.getMajorId());
-        Integer majorId = dataScopeService.resolveRequestedMajorId(request.getMajorId());
-        DashboardOverviewVO overview = dashboardMapper.selectOverview(deptId, majorId, request.getYear());
-        return overview == null ? new DashboardOverviewVO() : overview;
+        DashboardFilterRequest safeRequest = defaultFilter(request);
+        Integer deptId = dataScopeService.resolveRequestedDeptId(safeRequest.getDeptId(), safeRequest.getMajorId());
+        Integer majorId = dataScopeService.resolveRequestedMajorId(safeRequest.getMajorId());
+        return buildOverview(deptId, majorId, safeRequest.getYear());
     }
 
     public List<DashboardTrendPointVO> trend(DashboardTrendRequest request) {
@@ -80,27 +101,149 @@ public class DashboardService {
         return dashboardMapper.selectTrend(request.getMetric(), deptId, majorId, startYear, endYear);
     }
 
+    @Cacheable(cacheNames = "dashboard:rank", key = "T(com.major.common.util.CacheKeyUtils).dashboardRankKey(#request.deptId, #request.majorId, #request.metric, #request.year, #request.limit)")
     public List<DashboardRankVO> rank(DashboardRankRequest request) {
-        Integer majorId = dataScopeService.resolveRequestedMajorId(request.getMajorId());
-        Integer deptId = dataScopeService.resolveRequestedDeptId(request.getDeptId(), majorId);
-        Integer limit = request.getLimit() == null ? 10 : request.getLimit();
-        if (majorId != null) {
-            List<DashboardRankVO> all = dashboardMapper.selectRank(request.getMetric(), deptId, null, request.getYear(), 1000);
-            List<DashboardRankVO> filtered = new ArrayList<>();
-            for (DashboardRankVO item : all) {
-                if (majorId.equals(item.getMajorId())) {
-                    filtered.add(item);
-                }
-            }
-            return filtered;
-        }
-        return dashboardMapper.selectRank(request.getMetric(), deptId, null, request.getYear(), limit);
+        DashboardRankRequest safeRequest = defaultRankRequest(request);
+        Integer majorId = dataScopeService.resolveRequestedMajorId(safeRequest.getMajorId());
+        Integer deptId = dataScopeService.resolveRequestedDeptId(safeRequest.getDeptId(), majorId);
+        Integer limit = safeRequest.getLimit() == null ? 10 : safeRequest.getLimit();
+        return buildRank(deptId, majorId, safeRequest.getYear(), safeRequest.getMetric(), limit);
     }
 
+    @Cacheable(cacheNames = "dashboard:score", key = "T(com.major.common.util.CacheKeyUtils).dashboardScoreKey(#request.deptId, #request.majorId, #request.year)")
     public List<DashboardScoreVO> score(DashboardFilterRequest request) {
-        Integer deptId = dataScopeService.resolveRequestedDeptId(request.getDeptId(), request.getMajorId());
-        Integer majorId = dataScopeService.resolveRequestedMajorId(request.getMajorId());
-        List<DashboardScoreVO> scores = dashboardMapper.selectScore(deptId, majorId, request.getYear());
+        DashboardFilterRequest safeRequest = defaultFilter(request);
+        Integer deptId = dataScopeService.resolveRequestedDeptId(safeRequest.getDeptId(), safeRequest.getMajorId());
+        Integer majorId = dataScopeService.resolveRequestedMajorId(safeRequest.getMajorId());
+        return buildScore(deptId, majorId, safeRequest.getYear());
+    }
+
+    public List<WarningDetailVO> warnings(DashboardFilterRequest request) {
+        DashboardFilterRequest safeRequest = defaultFilter(request);
+        Integer deptId = dataScopeService.resolveRequestedDeptId(safeRequest.getDeptId(), safeRequest.getMajorId());
+        Integer majorId = dataScopeService.resolveRequestedMajorId(safeRequest.getMajorId());
+        return dashboardMapper.selectWarnings(deptId, majorId, safeRequest.getYear());
+    }
+
+    public void recalculateWarnings() {
+        warningService.recalculateAll();
+    }
+
+    public void warmupDashboardCache(DashboardFilterRequest request) {
+        DashboardFilterRequest safeRequest = defaultFilter(request);
+        Integer deptId = safeRequest.getDeptId();
+        Integer majorId = safeRequest.getMajorId();
+        Integer year = safeRequest.getYear();
+        warmupOverview(deptId, majorId, year);
+        warmupScore(deptId, majorId, year);
+        warmupWarningMetrics(deptId, majorId, year);
+        warmupRank(deptId, majorId, year, IndicatorConstants.EMPLOYMENT_RATE, 10);
+    }
+
+    public void warmupDashboardCacheForStartup() {
+        Integer currentYear = LocalDate.now().getYear();
+        warmupDashboardCacheForScope(null, null, currentYear);
+        warmupDashboardCacheForCommonDepartments(currentYear);
+        warmupDashboardCacheForCommonMajors(currentYear);
+    }
+
+    public void warmupDefaultCaches() {
+        warmupDashboardCacheForStartup();
+    }
+
+    private DashboardFilterRequest defaultFilter(DashboardFilterRequest request) {
+        DashboardFilterRequest safeRequest = request == null ? new DashboardFilterRequest() : request;
+        if (safeRequest.getYear() == null) {
+            safeRequest.setYear(LocalDate.now().getYear());
+        }
+        return safeRequest;
+    }
+
+    private DashboardRankRequest defaultRankRequest(DashboardRankRequest request) {
+        DashboardRankRequest safeRequest = request == null ? new DashboardRankRequest() : request;
+        if (safeRequest.getYear() == null) {
+            safeRequest.setYear(LocalDate.now().getYear());
+        }
+        if (safeRequest.getLimit() == null) {
+            safeRequest.setLimit(10);
+        }
+        return safeRequest;
+    }
+
+    public void warmupDashboardCacheForCommonDepartments(Integer year) {
+        Integer currentYear = year == null ? LocalDate.now().getYear() : year;
+        List<DepartmentEntity> departments = departmentMapper.selectList(new QueryWrapper<DepartmentEntity>().eq("deleted", 0));
+        departments.sort((left, right) -> Integer.compare(countMajors(right.getDeptId()), countMajors(left.getDeptId())));
+        int limit = Math.min(3, departments.size());
+        for (int i = 0; i < limit; i++) {
+            DepartmentEntity department = departments.get(i);
+            warmupDashboardCacheForScope(department.getDeptId(), null, currentYear);
+        }
+    }
+
+    public void warmupDashboardCacheForCommonMajors(Integer year) {
+        Integer currentYear = year == null ? LocalDate.now().getYear() : year;
+        List<MajorEntity> majors = majorMapper.selectList(new QueryWrapper<MajorEntity>().eq("deleted", 0));
+        majors.sort((left, right) -> Integer.compare(countStudents(right.getMajorId()), countStudents(left.getMajorId())));
+        int limit = Math.min(5, majors.size());
+        for (int i = 0; i < limit; i++) {
+            MajorEntity major = majors.get(i);
+            warmupDashboardCacheForScope(major.getDeptId(), major.getMajorId(), currentYear);
+        }
+    }
+
+    private void warmupDashboardCacheForScope(Integer deptId, Integer majorId, Integer year) {
+        warmupOverview(deptId, majorId, year);
+        warmupScore(deptId, majorId, year);
+        warmupWarningMetrics(deptId, majorId, year);
+        warmupRank(deptId, majorId, year, IndicatorConstants.EMPLOYMENT_RATE, 10);
+    }
+
+    public void warmupOverview(Integer deptId, Integer majorId, Integer year) {
+        Cache cache = cacheManager.getCache("dashboard:overview");
+        if (cache != null) {
+            cache.put(CacheKeyUtils.dashboardOverviewKey(deptId, majorId, year), buildOverview(deptId, majorId, year));
+        } else {
+            buildOverview(deptId, majorId, year);
+        }
+    }
+
+    public void warmupScore(Integer deptId, Integer majorId, Integer year) {
+        Cache cache = cacheManager.getCache("dashboard:score");
+        if (cache != null) {
+            cache.put(CacheKeyUtils.dashboardScoreKey(deptId, majorId, year), buildScore(deptId, majorId, year));
+        } else {
+            buildScore(deptId, majorId, year);
+        }
+    }
+
+    public void warmupWarningMetrics(Integer deptId, Integer majorId, Integer year) {
+        Cache cache = cacheManager.getCache("dashboard:warningMetrics");
+        if (cache != null) {
+            cache.put(CacheKeyUtils.dashboardWarningMetricsKey(deptId, majorId, year), buildWarningMetrics(deptId, majorId, year));
+        } else {
+            buildWarningMetrics(deptId, majorId, year);
+        }
+    }
+
+    public void warmupRank(Integer deptId, Integer majorId, Integer year, String metric, Integer limit) {
+        Cache cache = cacheManager.getCache("dashboard:rank");
+        if (cache != null) {
+            cache.put(CacheKeyUtils.dashboardRankKey(deptId, majorId, metric, year, limit), buildRank(deptId, majorId, year, metric, limit));
+        } else {
+            buildRank(deptId, majorId, year, metric, limit);
+        }
+    }
+
+
+
+    private DashboardOverviewVO buildOverview(Integer deptId, Integer majorId, Integer year) {
+        DashboardOverviewVO overview = dashboardMapper.selectOverview(deptId, majorId, year);
+        return overview == null ? new DashboardOverviewVO() : overview;
+    }
+
+    private List<DashboardScoreVO> buildScore(Integer deptId, Integer majorId, Integer year) {
+        List<DashboardScoreVO> scores = dashboardMapper.selectScore(deptId, majorId, year);
         Map<String, BigDecimal> weightMap = new HashMap<>();
         for (IndicatorRuleEntity rule : indicatorRuleMapper.selectList(new QueryWrapper<IndicatorRuleEntity>().eq("deleted", 0))) {
             weightMap.put(rule.getIndicatorCode(), rule.getWeight() == null ? BigDecimal.ZERO : rule.getWeight());
@@ -117,20 +260,8 @@ public class DashboardService {
         return scores;
     }
 
-    public List<WarningDetailVO> warnings(DashboardFilterRequest request) {
-        Integer deptId = dataScopeService.resolveRequestedDeptId(request.getDeptId(), request.getMajorId());
-        Integer majorId = dataScopeService.resolveRequestedMajorId(request.getMajorId());
-        return dashboardMapper.selectWarnings(deptId, majorId, request.getYear());
-    }
-
-    public void recalculateWarnings() {
-        warningService.recalculateAll();
-    }
-
-    public List<WarningMetricVO> warningMetrics(DashboardFilterRequest request) {
-        Integer deptId = dataScopeService.resolveRequestedDeptId(request.getDeptId(), request.getMajorId());
-        Integer majorId = dataScopeService.resolveRequestedMajorId(request.getMajorId());
-        DashboardOverviewVO overview = dashboardMapper.selectOverview(deptId, majorId, request.getYear());
+    private List<WarningMetricVO> buildWarningMetrics(Integer deptId, Integer majorId, Integer year) {
+        DashboardOverviewVO overview = dashboardMapper.selectOverview(deptId, majorId, year);
         DashboardOverviewVO safe = overview == null ? new DashboardOverviewVO() : overview;
 
         List<IndicatorRuleEntity> rules =
@@ -146,15 +277,43 @@ public class DashboardService {
 
             BigDecimal actual = resolveActualMetricValue(rule.getIndicatorCode(), safe);
             vo.setActualValue(actual);
-
-            String status = evaluate(rule.getCompareType(), actual, rule.getThresholdValue()) ? "PASS" : "WARN";
-            vo.setStatus(status);
-
+            vo.setStatus(evaluate(rule.getCompareType(), actual, rule.getThresholdValue()) ? "PASS" : "WARN");
             vo.setAttainmentRate(calcAttainment(rule.getCompareType(), actual, rule.getThresholdValue()));
             result.add(vo);
         }
-
         return result;
+    }
+
+    private List<DashboardRankVO> buildRank(Integer deptId, Integer majorId, Integer year, String metric, Integer limit) {
+        if (majorId != null) {
+            List<DashboardRankVO> all = dashboardMapper.selectRank(metric, deptId, null, year, 1000);
+            List<DashboardRankVO> filtered = new ArrayList<>();
+            for (DashboardRankVO item : all) {
+                if (majorId.equals(item.getMajorId())) {
+                    filtered.add(item);
+                }
+            }
+            return filtered;
+        }
+        return dashboardMapper.selectRank(metric, deptId, null, year, limit);
+    }
+
+    private int countMajors(Integer deptId) {
+        Long count = majorMapper.selectCount(new QueryWrapper<MajorEntity>().eq("deleted", 0).eq("dept_id", deptId));
+        return count == null ? 0 : count.intValue();
+    }
+
+    private int countStudents(Integer majorId) {
+        Long count = studentMapper.selectCount(new QueryWrapper<StudentEntity>().eq("deleted", 0).eq("major_id", majorId));
+        return count == null ? 0 : count.intValue();
+    }
+
+    @Cacheable(cacheNames = "dashboard:warningMetrics", key = "T(com.major.common.util.CacheKeyUtils).dashboardWarningMetricsKey(#request.deptId, #request.majorId, #request.year)")
+    public List<WarningMetricVO> warningMetrics(DashboardFilterRequest request) {
+        DashboardFilterRequest safeRequest = defaultFilter(request);
+        Integer deptId = dataScopeService.resolveRequestedDeptId(safeRequest.getDeptId(), safeRequest.getMajorId());
+        Integer majorId = dataScopeService.resolveRequestedMajorId(safeRequest.getMajorId());
+        return buildWarningMetrics(deptId, majorId, safeRequest.getYear());
     }
 
     private BigDecimal metricScore(BigDecimal metric, BigDecimal weight) {
@@ -205,4 +364,6 @@ public class DashboardService {
         }
         return safeActual.multiply(BigDecimal.valueOf(100)).divide(safeThreshold, 2, RoundingMode.HALF_UP);
     }
+
+
 }

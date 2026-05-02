@@ -35,6 +35,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -59,6 +60,7 @@ public class ImportService {
         this.graduateOutcomeMapper = graduateOutcomeMapper;
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics", "dashboard:rank"}, allEntries = true)
     public ImportResultVO importData(String type, MultipartFile file) {
         ImportTaskEntity task = new ImportTaskEntity();
         task.setTaskType(type);
