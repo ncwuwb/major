@@ -14,8 +14,8 @@ const selectedFile = ref(null)
 const importResult = ref(null)
 
 const notes = reactive([
-  '主数据导入重复时会直接报错，适合演示唯一性校验。',
-  '年度数据导入按业务唯一键覆盖更新，适合反复演示。',
+  '主数据导入重复时会直接报错。',
+  '年度数据导入按业务唯一键覆盖更新。',
   '支持 Excel 与 CSV 文件。',
 ])
 
@@ -91,7 +91,6 @@ async function handleImport() {
           <div class="section-title">
             <div>
               <h3>导入规则说明</h3>
-              <p>答辩时可以用这里说明系统对异常数据和重复数据的处理策略。</p>
             </div>
           </div>
 

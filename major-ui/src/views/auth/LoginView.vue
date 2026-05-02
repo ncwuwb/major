@@ -42,7 +42,9 @@ async function handleLogin() {
   <div class="login-view">
     <div class="login-view__panel">
       <div class="login-view__brand">
-        <div class="login-view__logo">M</div>
+        <div class="login-view__logo-wrap">
+          <img class="login-view__logo" src="/logo.png" alt="平台 Logo" />
+        </div>
         <h1>高校专业数据资源监测平台</h1>
         <p class="muted">专业建设 · 数据监测 · 质量评估</p>
       </div>
@@ -65,12 +67,7 @@ async function handleLogin() {
           </el-button>
         </el-form>
 
-        <div class="login-card__tips">
-          <div>
-            <span class="muted">默认账号</span>
-            <strong>admin / admin123456</strong>
-          </div>
-        </div>
+
       </div>
     </div>
   </div>
@@ -79,9 +76,10 @@ async function handleLogin() {
 <style scoped>
 .login-view {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   min-height: 100vh;
+  padding-top: 2vh;
   background:
     radial-gradient(circle at 30% 20%, rgba(15, 157, 138, 0.08), transparent 40%),
     radial-gradient(circle at 70% 80%, rgba(242, 155, 56, 0.06), transparent 40%),
@@ -93,7 +91,7 @@ async function handleLogin() {
   flex-direction: column;
   align-items: center;
   gap: 28px;
-  padding: 40px 20px;
+  padding: 24px 20px 40px;
   width: 100%;
   max-width: 460px;
 }
@@ -102,19 +100,24 @@ async function handleLogin() {
   text-align: center;
 }
 
-.login-view__logo {
+.login-view__logo-wrap {
   display: inline-flex;
-  width: 56px;
-  height: 56px;
+  width: 72px;
+  height: 72px;
   align-items: center;
   justify-content: center;
-  border-radius: 18px;
-  background: linear-gradient(135deg, var(--brand-primary), var(--brand-accent));
-  color: white;
-  font-size: 28px;
-  font-weight: 900;
-  box-shadow: 0 10px 24px rgba(15, 157, 138, 0.22);
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(15, 157, 138, 0.12), rgba(15, 157, 138, 0.04));
+  box-shadow: 0 10px 24px rgba(15, 157, 138, 0.16);
   margin-bottom: 18px;
+}
+
+.login-view__logo {
+  display: block;
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 16px;
 }
 
 .login-view__brand h1 {
@@ -163,8 +166,12 @@ async function handleLogin() {
 }
 
 @media (max-width: 520px) {
+  .login-view {
+    padding-top: 3vh;
+  }
+
   .login-view__panel {
-    padding: 24px 16px;
+    padding: 16px 16px 32px;
   }
 
   .login-card {

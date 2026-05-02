@@ -46,7 +46,9 @@ function handleNavigate(path) {
 <template>
   <aside class="sidebar" :class="{ 'sidebar--collapsed': appStore.sidebarCollapsed }">
     <div class="sidebar__brand">
-      <div class="sidebar__logo">M</div>
+      <div class="sidebar__logo-wrap">
+        <img class="sidebar__logo" src="/logo.png" alt="平台 Logo" />
+      </div>
       <div v-if="!appStore.sidebarCollapsed" class="sidebar__brand-text">
         <strong>专业监测平台</strong>
         <span>Major Resource Dashboard</span>
@@ -121,18 +123,24 @@ function handleNavigate(path) {
   padding: 0 8px 18px;
 }
 
-.sidebar__logo {
+.sidebar__logo-wrap {
   display: flex;
-  width: 44px;
-  height: 44px;
+  width: 52px;
+  height: 52px;
   align-items: center;
   justify-content: center;
   border-radius: 16px;
-  background: linear-gradient(135deg, var(--brand-primary), var(--brand-accent));
-  color: white;
-  font-size: 22px;
-  font-weight: 900;
-  box-shadow: 0 10px 20px rgba(15, 157, 138, 0.22);
+  background: linear-gradient(135deg, rgba(15, 157, 138, 0.12), rgba(15, 157, 138, 0.04));
+  box-shadow: 0 10px 20px rgba(15, 157, 138, 0.14);
+  flex-shrink: 0;
+}
+
+.sidebar__logo {
+  display: block;
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 12px;
 }
 
 .sidebar__brand-text {
@@ -148,6 +156,25 @@ function handleNavigate(path) {
 .sidebar__brand-text span {
   color: var(--sidebar-text-muted);
   font-size: 12px;
+}
+
+.sidebar--collapsed .sidebar__brand {
+  justify-content: center;
+  padding-bottom: 16px;
+}
+
+.sidebar--collapsed .sidebar__logo-wrap {
+  width: 44px;
+  height: 44px;
+}
+
+.sidebar--collapsed .sidebar__logo {
+  width: 34px;
+  height: 34px;
+}
+
+.sidebar--collapsed .sidebar__brand-text {
+  display: none;
 }
 
 .sidebar__menu-wrap {
