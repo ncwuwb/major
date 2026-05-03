@@ -11,7 +11,7 @@
  Target Server Version : 80026 (8.0.26)
  File Encoding         : 65001
 
- Date: 20/03/2026 10:26:36
+ Date: 03/05/2026 16:05:26
 */
 
 SET NAMES utf8mb4;
@@ -403,7 +403,7 @@ CREATE TABLE `experimentbase`  (
   PRIMARY KEY (`base_id`) USING BTREE,
   INDEX `major_id`(`major_id` ASC) USING BTREE,
   CONSTRAINT `experimentbase_ibfk_1` FOREIGN KEY (`major_id`) REFERENCES `major` (`major_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '专业实验与实训基地表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '专业实验与实训基地表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of experimentbase
@@ -628,7 +628,7 @@ CREATE TABLE `internationalexchange`  (
   PRIMARY KEY (`exchange_id`) USING BTREE,
   INDEX `student_id`(`student_id` ASC) USING BTREE,
   CONSTRAINT `internationalexchange_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `student` (`student_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '学生国际交流信息表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '学生国际交流信息表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of internationalexchange
@@ -685,11 +685,16 @@ CREATE TABLE `operation_log`  (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `deleted` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`log_id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '操作日志表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '操作日志表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of operation_log
 -- ----------------------------
+INSERT INTO `operation_log` VALUES (1, 1, 'admin', '用户管理', '新增用户', 'POST', '/api/users', '{\"username\":\"hlxy\",\"realName\":\"护理学院\",\"phone\":\"13938549908\",\"email\":\"12345@163.com\",\"roleCode\":\"DEPT_ADMIN\",\"scopeType\":\"DEPT\",\"scopeId\":1,\"status\":1}', 0, 'rawPassword cannot be null', '2026-03-20 11:34:40', 0);
+INSERT INTO `operation_log` VALUES (2, 1, 'admin', '用户管理', '新增用户', 'POST', '/api/users', '{\"username\":\"hlxy\",\"realName\":\"护理学院\",\"phone\":\"13938549908\",\"email\":\"12345@163.com\",\"roleCode\":\"DEPT_ADMIN\",\"scopeType\":\"DEPT\",\"scopeId\":1,\"status\":1}', 0, 'rawPassword cannot be null', '2026-03-20 11:34:46', 0);
+INSERT INTO `operation_log` VALUES (3, 1, 'admin', '用户管理', '新增用户', 'POST', '/api/users', '{\"username\":\"hlxy\",\"realName\":\"护理学院\",\"phone\":\"13938549908\",\"email\":\"12345@163.com\",\"roleCode\":\"DEPT_ADMIN\",\"scopeType\":\"DEPT\",\"scopeId\":1,\"status\":1}', 0, 'rawPassword cannot be null', '2026-03-20 11:35:05', 0);
+INSERT INTO `operation_log` VALUES (4, 1, 'admin', '用户管理', '新增用户', 'POST', '/api/users', '{\"username\":\"hlxy\",\"realName\":\"护理学院\",\"phone\":\"13938549908\",\"email\":\"12345@163.com\",\"roleCode\":\"DEPT_ADMIN\",\"scopeType\":\"DEPT\",\"scopeId\":1,\"status\":1}', 0, 'rawPassword cannot be null', '2026-03-20 11:35:16', 0);
+INSERT INTO `operation_log` VALUES (5, 1, 'admin', '用户管理', '新增用户', 'POST', '/api/users', '{\"username\":\"hlxy\",\"realName\":\"护理学院\",\"phone\":\"13938549908\",\"email\":\"12345@163.com\",\"roleCode\":\"DEPT_ADMIN\",\"scopeType\":\"DEPT\",\"scopeId\":1,\"status\":1}', 1, NULL, '2026-03-20 11:37:29', 0);
 
 -- ----------------------------
 -- Table structure for report_template
@@ -743,7 +748,7 @@ CREATE TABLE `researchachievement`  (
   PRIMARY KEY (`achievement_id`) USING BTREE,
   INDEX `teacher_id`(`teacher_id` ASC) USING BTREE,
   CONSTRAINT `researchachievement_ibfk_1` FOREIGN KEY (`teacher_id`) REFERENCES `teacher` (`teacher_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '教师科研成果表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '教师科研成果表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of researchachievement
@@ -895,12 +900,13 @@ CREATE TABLE `sys_user`  (
   `deleted` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`user_id`) USING BTREE,
   UNIQUE INDEX `uk_sys_user_username`(`username` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '系统用户表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '系统用户表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sys_user
 -- ----------------------------
-INSERT INTO `sys_user` VALUES (1, 'admin', '{bcrypt}$2a$10$aX9pFSMWNvBKq1e2gxfc2ODqSN9AsuxhGUzDWyWawjBvCwShpjiTa', '系统管理员', NULL, NULL, 'SCHOOL_ADMIN', 'SCHOOL', 1, 1, '2026-03-20 09:53:53', '2026-03-11 17:47:22', '2026-03-11 17:47:22', 0);
+INSERT INTO `sys_user` VALUES (1, 'admin', '{bcrypt}$2a$10$aX9pFSMWNvBKq1e2gxfc2ODqSN9AsuxhGUzDWyWawjBvCwShpjiTa', '系统管理员', NULL, NULL, 'SCHOOL_ADMIN', 'SCHOOL', 1, 1, '2026-05-02 17:07:25', '2026-03-11 17:47:22', '2026-03-11 17:47:22', 0);
+INSERT INTO `sys_user` VALUES (2, 'hlxy', '{bcrypt}$2a$10$aX9pFSMWNvBKq1e2gxfc2ODqSN9AsuxhGUzDWyWawjBvCwShpjiTa', '护理学院', '13938549908', '12345@163.com', 'DEPT_ADMIN', 'DEPT', 1, 1, '2026-05-02 15:11:01', '2026-03-20 11:37:30', '2026-04-13 22:06:18', 0);
 
 -- ----------------------------
 -- Table structure for teacher
@@ -988,42 +994,71 @@ CREATE TABLE `warning_record`  (
   PRIMARY KEY (`warning_id`) USING BTREE,
   INDEX `idx_warning_major_year`(`major_id` ASC, `stat_year` ASC) USING BTREE,
   CONSTRAINT `fk_warning_major` FOREIGN KEY (`major_id`) REFERENCES `major` (`major_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 33 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '预警记录表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 62 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '预警记录表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of warning_record
 -- ----------------------------
-INSERT INTO `warning_record` VALUES (1, 1, 'PHD_RATE', '博士占比', 2023, 'LT', 40.00, 37.50, 'ACTIVE', '博士占比 37.50% 低于阈值 40.00%', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
-INSERT INTO `warning_record` VALUES (2, 2, 'PHD_RATE', '博士占比', 2023, 'LT', 40.00, 37.50, 'ACTIVE', '博士占比 37.50% 低于阈值 40.00%', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
-INSERT INTO `warning_record` VALUES (3, 2, 'ADMISSION_COMPLETION_RATE', '招生完成率', 2023, 'LT', 90.00, 83.08, 'ACTIVE', '招生完成率 83.08% 低于阈值 90.00%', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
-INSERT INTO `warning_record` VALUES (4, 2, 'FUNDING_UTILIZATION_RATE', '经费使用率', 2023, 'LT', 70.00, 61.67, 'ACTIVE', '经费使用率 61.67% 低于阈值 70.00%', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
-INSERT INTO `warning_record` VALUES (5, 2, 'EMPLOYMENT_RATE', '就业率', 2023, 'LT', 80.00, 76.20, 'ACTIVE', '就业率 76.20% 低于阈值 80.00%', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
-INSERT INTO `warning_record` VALUES (6, 2, 'POSTGRADUATE_RATE', '升学率', 2023, 'LT', 15.00, 10.80, 'ACTIVE', '升学率 10.80% 低于阈值 15.00%', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
-INSERT INTO `warning_record` VALUES (7, 6, 'ADMISSION_COMPLETION_RATE', '招生完成率', 2023, 'LT', 90.00, 83.64, 'ACTIVE', '招生完成率 83.64% 低于阈值 90.00%', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
-INSERT INTO `warning_record` VALUES (8, 6, 'FUNDING_UTILIZATION_RATE', '经费使用率', 2023, 'LT', 70.00, 63.00, 'ACTIVE', '经费使用率 63.00% 低于阈值 70.00%', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
-INSERT INTO `warning_record` VALUES (9, 6, 'EMPLOYMENT_RATE', '就业率', 2023, 'LT', 80.00, 75.00, 'ACTIVE', '就业率 75.00% 低于阈值 80.00%', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
-INSERT INTO `warning_record` VALUES (10, 6, 'POSTGRADUATE_RATE', '升学率', 2023, 'LT', 15.00, 12.00, 'ACTIVE', '升学率 12.00% 低于阈值 15.00%', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
-INSERT INTO `warning_record` VALUES (11, 8, 'POSTGRADUATE_RATE', '升学率', 2023, 'LT', 15.00, 13.80, 'ACTIVE', '升学率 13.80% 低于阈值 15.00%', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
-INSERT INTO `warning_record` VALUES (12, 1, 'PHD_RATE', '博士占比', 2024, 'LT', 40.00, 37.50, 'ACTIVE', '博士占比 37.50% 低于阈值 40.00%', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
-INSERT INTO `warning_record` VALUES (13, 2, 'PHD_RATE', '博士占比', 2024, 'LT', 40.00, 37.50, 'ACTIVE', '博士占比 37.50% 低于阈值 40.00%', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
-INSERT INTO `warning_record` VALUES (14, 2, 'ADMISSION_COMPLETION_RATE', '招生完成率', 2024, 'LT', 90.00, 85.71, 'ACTIVE', '招生完成率 85.71% 低于阈值 90.00%', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
-INSERT INTO `warning_record` VALUES (15, 2, 'FUNDING_UTILIZATION_RATE', '经费使用率', 2024, 'LT', 70.00, 64.62, 'ACTIVE', '经费使用率 64.62% 低于阈值 70.00%', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
-INSERT INTO `warning_record` VALUES (16, 2, 'EMPLOYMENT_RATE', '就业率', 2024, 'LT', 80.00, 78.50, 'ACTIVE', '就业率 78.50% 低于阈值 80.00%', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
-INSERT INTO `warning_record` VALUES (17, 2, 'POSTGRADUATE_RATE', '升学率', 2024, 'LT', 15.00, 11.50, 'ACTIVE', '升学率 11.50% 低于阈值 15.00%', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
-INSERT INTO `warning_record` VALUES (18, 6, 'ADMISSION_COMPLETION_RATE', '招生完成率', 2024, 'LT', 90.00, 86.21, 'ACTIVE', '招生完成率 86.21% 低于阈值 90.00%', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
-INSERT INTO `warning_record` VALUES (19, 6, 'FUNDING_UTILIZATION_RATE', '经费使用率', 2024, 'LT', 70.00, 66.67, 'ACTIVE', '经费使用率 66.67% 低于阈值 70.00%', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
-INSERT INTO `warning_record` VALUES (20, 6, 'EMPLOYMENT_RATE', '就业率', 2024, 'LT', 80.00, 76.50, 'ACTIVE', '就业率 76.50% 低于阈值 80.00%', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
-INSERT INTO `warning_record` VALUES (21, 6, 'POSTGRADUATE_RATE', '升学率', 2024, 'LT', 15.00, 12.80, 'ACTIVE', '升学率 12.80% 低于阈值 15.00%', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
-INSERT INTO `warning_record` VALUES (22, 8, 'POSTGRADUATE_RATE', '升学率', 2024, 'LT', 15.00, 14.50, 'ACTIVE', '升学率 14.50% 低于阈值 15.00%', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
-INSERT INTO `warning_record` VALUES (23, 1, 'PHD_RATE', '博士占比', 2025, 'LT', 40.00, 37.50, 'ACTIVE', '博士占比 37.50% 低于阈值 40.00%', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
-INSERT INTO `warning_record` VALUES (24, 2, 'PHD_RATE', '博士占比', 2025, 'LT', 40.00, 37.50, 'ACTIVE', '博士占比 37.50% 低于阈值 40.00%', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
-INSERT INTO `warning_record` VALUES (25, 2, 'ADMISSION_COMPLETION_RATE', '招生完成率', 2025, 'LT', 90.00, 86.67, 'ACTIVE', '招生完成率 86.67% 低于阈值 90.00%', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
-INSERT INTO `warning_record` VALUES (26, 2, 'FUNDING_UTILIZATION_RATE', '经费使用率', 2025, 'LT', 70.00, 67.14, 'ACTIVE', '经费使用率 67.14% 低于阈值 70.00%', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
-INSERT INTO `warning_record` VALUES (27, 2, 'EMPLOYMENT_RATE', '就业率', 2025, 'LT', 80.00, 79.80, 'ACTIVE', '就业率 79.80% 低于阈值 80.00%', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
-INSERT INTO `warning_record` VALUES (28, 2, 'POSTGRADUATE_RATE', '升学率', 2025, 'LT', 15.00, 12.20, 'ACTIVE', '升学率 12.20% 低于阈值 15.00%', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
-INSERT INTO `warning_record` VALUES (29, 6, 'ADMISSION_COMPLETION_RATE', '招生完成率', 2025, 'LT', 90.00, 86.67, 'ACTIVE', '招生完成率 86.67% 低于阈值 90.00%', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
-INSERT INTO `warning_record` VALUES (30, 6, 'FUNDING_UTILIZATION_RATE', '经费使用率', 2025, 'LT', 70.00, 67.83, 'ACTIVE', '经费使用率 67.83% 低于阈值 70.00%', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
-INSERT INTO `warning_record` VALUES (31, 6, 'EMPLOYMENT_RATE', '就业率', 2025, 'LT', 80.00, 78.20, 'ACTIVE', '就业率 78.20% 低于阈值 80.00%', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
-INSERT INTO `warning_record` VALUES (32, 6, 'POSTGRADUATE_RATE', '升学率', 2025, 'LT', 15.00, 13.50, 'ACTIVE', '升学率 13.50% 低于阈值 15.00%', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
+INSERT INTO `warning_record` VALUES (1, 1, 'PHD_RATE', '博士占比', 2023, 'LT', 40.00, 37.50, 'ACTIVE', '博士占比 actual 37.50 threshold 40.00', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
+INSERT INTO `warning_record` VALUES (2, 2, 'PHD_RATE', '博士占比', 2023, 'LT', 40.00, 37.50, 'ACTIVE', '博士占比 actual 37.50 threshold 40.00', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
+INSERT INTO `warning_record` VALUES (3, 2, 'ADMISSION_COMPLETION_RATE', '招生完成率', 2023, 'LT', 90.00, 83.08, 'ACTIVE', '招生完成率 actual 83.08 threshold 90.00', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
+INSERT INTO `warning_record` VALUES (4, 2, 'FUNDING_UTILIZATION_RATE', '经费使用率', 2023, 'LT', 70.00, 61.67, 'ACTIVE', '经费使用率 actual 61.67 threshold 70.00', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
+INSERT INTO `warning_record` VALUES (5, 2, 'EMPLOYMENT_RATE', '就业率', 2023, 'LT', 80.00, 76.20, 'ACTIVE', '就业率 actual 76.20 threshold 80.00', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
+INSERT INTO `warning_record` VALUES (6, 2, 'POSTGRADUATE_RATE', '升学率', 2023, 'LT', 15.00, 10.80, 'ACTIVE', '升学率 actual 10.80 threshold 15.00', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
+INSERT INTO `warning_record` VALUES (7, 6, 'ADMISSION_COMPLETION_RATE', '招生完成率', 2023, 'LT', 90.00, 83.64, 'ACTIVE', '招生完成率 actual 83.64 threshold 90.00', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
+INSERT INTO `warning_record` VALUES (8, 6, 'FUNDING_UTILIZATION_RATE', '经费使用率', 2023, 'LT', 70.00, 63.00, 'ACTIVE', '经费使用率 actual 63.00 threshold 70.00', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
+INSERT INTO `warning_record` VALUES (9, 6, 'EMPLOYMENT_RATE', '就业率', 2023, 'LT', 80.00, 75.00, 'ACTIVE', '就业率 actual 75.00 threshold 80.00', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
+INSERT INTO `warning_record` VALUES (10, 6, 'POSTGRADUATE_RATE', '升学率', 2023, 'LT', 15.00, 12.00, 'ACTIVE', '升学率 actual 12.00 threshold 15.00', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
+INSERT INTO `warning_record` VALUES (11, 8, 'POSTGRADUATE_RATE', '升学率', 2023, 'LT', 15.00, 13.80, 'ACTIVE', '升学率 actual 13.80 threshold 15.00', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
+INSERT INTO `warning_record` VALUES (12, 1, 'PHD_RATE', '博士占比', 2024, 'LT', 40.00, 37.50, 'ACTIVE', '博士占比 actual 37.50 threshold 40.00', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
+INSERT INTO `warning_record` VALUES (13, 2, 'PHD_RATE', '博士占比', 2024, 'LT', 40.00, 37.50, 'ACTIVE', '博士占比 actual 37.50 threshold 40.00', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
+INSERT INTO `warning_record` VALUES (14, 2, 'ADMISSION_COMPLETION_RATE', '招生完成率', 2024, 'LT', 90.00, 85.71, 'ACTIVE', '招生完成率 actual 85.71 threshold 90.00', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
+INSERT INTO `warning_record` VALUES (15, 2, 'FUNDING_UTILIZATION_RATE', '经费使用率', 2024, 'LT', 70.00, 64.62, 'ACTIVE', '经费使用率 actual 64.62 threshold 70.00', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
+INSERT INTO `warning_record` VALUES (16, 2, 'EMPLOYMENT_RATE', '就业率', 2024, 'LT', 80.00, 78.50, 'ACTIVE', '就业率 actual 78.50 threshold 80.00', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
+INSERT INTO `warning_record` VALUES (17, 2, 'POSTGRADUATE_RATE', '升学率', 2024, 'LT', 15.00, 11.50, 'ACTIVE', '升学率 actual 11.50 threshold 15.00', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
+INSERT INTO `warning_record` VALUES (18, 6, 'ADMISSION_COMPLETION_RATE', '招生完成率', 2024, 'LT', 90.00, 86.21, 'ACTIVE', '招生完成率 actual 86.21 threshold 90.00', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
+INSERT INTO `warning_record` VALUES (19, 6, 'FUNDING_UTILIZATION_RATE', '经费使用率', 2024, 'LT', 70.00, 66.67, 'ACTIVE', '经费使用率 actual 66.67 threshold 70.00', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
+INSERT INTO `warning_record` VALUES (20, 6, 'EMPLOYMENT_RATE', '就业率', 2024, 'LT', 80.00, 76.50, 'ACTIVE', '就业率 actual 76.50 threshold 80.00', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
+INSERT INTO `warning_record` VALUES (21, 6, 'POSTGRADUATE_RATE', '升学率', 2024, 'LT', 15.00, 12.80, 'ACTIVE', '升学率 actual 12.80 threshold 15.00', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
+INSERT INTO `warning_record` VALUES (22, 8, 'POSTGRADUATE_RATE', '升学率', 2024, 'LT', 15.00, 14.50, 'ACTIVE', '升学率 actual 14.50 threshold 15.00', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
+INSERT INTO `warning_record` VALUES (23, 1, 'PHD_RATE', '博士占比', 2025, 'LT', 40.00, 37.50, 'ACTIVE', '博士占比 actual 37.50 threshold 40.00', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
+INSERT INTO `warning_record` VALUES (24, 2, 'PHD_RATE', '博士占比', 2025, 'LT', 40.00, 37.50, 'ACTIVE', '博士占比 actual 37.50 threshold 40.00', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
+INSERT INTO `warning_record` VALUES (25, 2, 'ADMISSION_COMPLETION_RATE', '招生完成率', 2025, 'LT', 90.00, 86.67, 'ACTIVE', '招生完成率 actual 86.67 threshold 90.00', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
+INSERT INTO `warning_record` VALUES (26, 2, 'FUNDING_UTILIZATION_RATE', '经费使用率', 2025, 'LT', 70.00, 67.14, 'ACTIVE', '经费使用率 actual 67.14 threshold 70.00', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
+INSERT INTO `warning_record` VALUES (27, 2, 'EMPLOYMENT_RATE', '就业率', 2025, 'LT', 80.00, 79.80, 'ACTIVE', '就业率 actual 79.80 threshold 80.00', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
+INSERT INTO `warning_record` VALUES (28, 2, 'POSTGRADUATE_RATE', '升学率', 2025, 'LT', 15.00, 12.20, 'ACTIVE', '升学率 actual 12.20 threshold 15.00', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
+INSERT INTO `warning_record` VALUES (29, 6, 'ADMISSION_COMPLETION_RATE', '招生完成率', 2025, 'LT', 90.00, 86.67, 'ACTIVE', '招生完成率 actual 86.67 threshold 90.00', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
+INSERT INTO `warning_record` VALUES (30, 6, 'FUNDING_UTILIZATION_RATE', '经费使用率', 2025, 'LT', 70.00, 67.83, 'ACTIVE', '经费使用率 actual 67.83 threshold 70.00', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
+INSERT INTO `warning_record` VALUES (31, 6, 'EMPLOYMENT_RATE', '就业率', 2025, 'LT', 80.00, 78.20, 'ACTIVE', '就业率 actual 78.20 threshold 80.00', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
+INSERT INTO `warning_record` VALUES (32, 6, 'POSTGRADUATE_RATE', '升学率', 2025, 'LT', 15.00, 13.50, 'ACTIVE', '升学率 actual 13.50 threshold 15.00', '2026-03-20 10:22:23', NULL, '2026-03-20 10:22:23', '2026-03-20 10:22:23', 0);
+INSERT INTO `warning_record` VALUES (33, 1, 'PHD_RATE', '博士占比', 2021, 'LT', 40.00, 37.50, 'ACTIVE', '博士占比 actual 37.50 threshold 40.00', '2026-04-13 22:02:09', NULL, '2026-04-13 22:02:09', '2026-04-13 22:02:09', 0);
+INSERT INTO `warning_record` VALUES (34, 1, 'PHD_RATE', '博士占比', 2022, 'LT', 40.00, 37.50, 'ACTIVE', '博士占比 actual 37.50 threshold 40.00', '2026-04-13 22:02:09', NULL, '2026-04-13 22:02:09', '2026-04-13 22:02:09', 0);
+INSERT INTO `warning_record` VALUES (35, 2, 'PHD_RATE', '博士占比', 2021, 'LT', 40.00, 37.50, 'ACTIVE', '博士占比 actual 37.50 threshold 40.00', '2026-04-13 22:02:09', NULL, '2026-04-13 22:02:09', '2026-04-13 22:02:09', 0);
+INSERT INTO `warning_record` VALUES (36, 2, 'ADMISSION_COMPLETION_RATE', '招生完成率', 2021, 'LT', 90.00, 76.36, 'ACTIVE', '招生完成率 actual 76.36 threshold 90.00', '2026-04-13 22:02:09', NULL, '2026-04-13 22:02:09', '2026-04-13 22:02:09', 0);
+INSERT INTO `warning_record` VALUES (37, 2, 'FUNDING_UTILIZATION_RATE', '经费使用率', 2021, 'LT', 70.00, 55.00, 'ACTIVE', '经费使用率 actual 55.00 threshold 70.00', '2026-04-13 22:02:09', NULL, '2026-04-13 22:02:09', '2026-04-13 22:02:09', 0);
+INSERT INTO `warning_record` VALUES (38, 2, 'EMPLOYMENT_RATE', '就业率', 2021, 'LT', 80.00, 72.50, 'ACTIVE', '就业率 actual 72.50 threshold 80.00', '2026-04-13 22:02:09', NULL, '2026-04-13 22:02:09', '2026-04-13 22:02:09', 0);
+INSERT INTO `warning_record` VALUES (39, 2, 'POSTGRADUATE_RATE', '升学率', 2021, 'LT', 15.00, 8.20, 'ACTIVE', '升学率 actual 8.20 threshold 15.00', '2026-04-13 22:02:09', NULL, '2026-04-13 22:02:09', '2026-04-13 22:02:09', 0);
+INSERT INTO `warning_record` VALUES (40, 2, 'PHD_RATE', '博士占比', 2022, 'LT', 40.00, 37.50, 'ACTIVE', '博士占比 actual 37.50 threshold 40.00', '2026-04-13 22:02:09', NULL, '2026-04-13 22:02:09', '2026-04-13 22:02:09', 0);
+INSERT INTO `warning_record` VALUES (41, 2, 'ADMISSION_COMPLETION_RATE', '招生完成率', 2022, 'LT', 90.00, 80.00, 'ACTIVE', '招生完成率 actual 80.00 threshold 90.00', '2026-04-13 22:02:09', NULL, '2026-04-13 22:02:09', '2026-04-13 22:02:09', 0);
+INSERT INTO `warning_record` VALUES (42, 2, 'FUNDING_UTILIZATION_RATE', '经费使用率', 2022, 'LT', 70.00, 58.18, 'ACTIVE', '经费使用率 actual 58.18 threshold 70.00', '2026-04-13 22:02:09', NULL, '2026-04-13 22:02:09', '2026-04-13 22:02:09', 0);
+INSERT INTO `warning_record` VALUES (43, 2, 'EMPLOYMENT_RATE', '就业率', 2022, 'LT', 80.00, 74.80, 'ACTIVE', '就业率 actual 74.80 threshold 80.00', '2026-04-13 22:02:09', NULL, '2026-04-13 22:02:09', '2026-04-13 22:02:09', 0);
+INSERT INTO `warning_record` VALUES (44, 2, 'POSTGRADUATE_RATE', '升学率', 2022, 'LT', 15.00, 9.50, 'ACTIVE', '升学率 actual 9.50 threshold 15.00', '2026-04-13 22:02:09', NULL, '2026-04-13 22:02:09', '2026-04-13 22:02:09', 0);
+INSERT INTO `warning_record` VALUES (45, 4, 'ADMISSION_COMPLETION_RATE', '招生完成率', 2021, 'LT', 90.00, 88.89, 'ACTIVE', '招生完成率 actual 88.89 threshold 90.00', '2026-04-13 22:02:10', NULL, '2026-04-13 22:02:10', '2026-04-13 22:02:10', 0);
+INSERT INTO `warning_record` VALUES (46, 5, 'ADMISSION_COMPLETION_RATE', '招生完成率', 2021, 'LT', 90.00, 85.71, 'ACTIVE', '招生完成率 actual 85.71 threshold 90.00', '2026-04-13 22:02:10', NULL, '2026-04-13 22:02:10', '2026-04-13 22:02:10', 0);
+INSERT INTO `warning_record` VALUES (47, 5, 'ADMISSION_COMPLETION_RATE', '招生完成率', 2022, 'LT', 90.00, 88.89, 'ACTIVE', '招生完成率 actual 88.89 threshold 90.00', '2026-04-13 22:02:10', NULL, '2026-04-13 22:02:10', '2026-04-13 22:02:10', 0);
+INSERT INTO `warning_record` VALUES (48, 6, 'ADMISSION_COMPLETION_RATE', '招生完成率', 2021, 'LT', 90.00, 76.00, 'ACTIVE', '招生完成率 actual 76.00 threshold 90.00', '2026-04-13 22:02:10', NULL, '2026-04-13 22:02:10', '2026-04-13 22:02:10', 0);
+INSERT INTO `warning_record` VALUES (49, 6, 'FUNDING_UTILIZATION_RATE', '经费使用率', 2021, 'LT', 70.00, 53.33, 'ACTIVE', '经费使用率 actual 53.33 threshold 70.00', '2026-04-13 22:02:10', NULL, '2026-04-13 22:02:10', '2026-04-13 22:02:10', 0);
+INSERT INTO `warning_record` VALUES (50, 6, 'EMPLOYMENT_RATE', '就业率', 2021, 'LT', 80.00, 70.20, 'ACTIVE', '就业率 actual 70.20 threshold 80.00', '2026-04-13 22:02:10', NULL, '2026-04-13 22:02:10', '2026-04-13 22:02:10', 0);
+INSERT INTO `warning_record` VALUES (51, 6, 'POSTGRADUATE_RATE', '升学率', 2021, 'LT', 15.00, 10.50, 'ACTIVE', '升学率 actual 10.50 threshold 15.00', '2026-04-13 22:02:10', NULL, '2026-04-13 22:02:10', '2026-04-13 22:02:10', 0);
+INSERT INTO `warning_record` VALUES (52, 6, 'ADMISSION_COMPLETION_RATE', '招生完成率', 2022, 'LT', 90.00, 80.77, 'ACTIVE', '招生完成率 actual 80.77 threshold 90.00', '2026-04-13 22:02:10', NULL, '2026-04-13 22:02:10', '2026-04-13 22:02:10', 0);
+INSERT INTO `warning_record` VALUES (53, 6, 'FUNDING_UTILIZATION_RATE', '经费使用率', 2022, 'LT', 70.00, 57.89, 'ACTIVE', '经费使用率 actual 57.89 threshold 70.00', '2026-04-13 22:02:10', NULL, '2026-04-13 22:02:10', '2026-04-13 22:02:10', 0);
+INSERT INTO `warning_record` VALUES (54, 6, 'EMPLOYMENT_RATE', '就业率', 2022, 'LT', 80.00, 72.80, 'ACTIVE', '就业率 actual 72.80 threshold 80.00', '2026-04-13 22:02:10', NULL, '2026-04-13 22:02:10', '2026-04-13 22:02:10', 0);
+INSERT INTO `warning_record` VALUES (55, 6, 'POSTGRADUATE_RATE', '升学率', 2022, 'LT', 15.00, 11.20, 'ACTIVE', '升学率 actual 11.20 threshold 15.00', '2026-04-13 22:02:10', NULL, '2026-04-13 22:02:10', '2026-04-13 22:02:10', 0);
+INSERT INTO `warning_record` VALUES (56, 8, 'ADMISSION_COMPLETION_RATE', '招生完成率', 2021, 'LT', 90.00, 83.33, 'ACTIVE', '招生完成率 actual 83.33 threshold 90.00', '2026-04-13 22:02:10', NULL, '2026-04-13 22:02:10', '2026-04-13 22:02:10', 0);
+INSERT INTO `warning_record` VALUES (57, 8, 'FUNDING_UTILIZATION_RATE', '经费使用率', 2021, 'LT', 70.00, 67.69, 'ACTIVE', '经费使用率 actual 67.69 threshold 70.00', '2026-04-13 22:02:10', NULL, '2026-04-13 22:02:10', '2026-04-13 22:02:10', 0);
+INSERT INTO `warning_record` VALUES (58, 8, 'POSTGRADUATE_RATE', '升学率', 2021, 'LT', 15.00, 12.50, 'ACTIVE', '升学率 actual 12.50 threshold 15.00', '2026-04-13 22:02:10', NULL, '2026-04-13 22:02:10', '2026-04-13 22:02:10', 0);
+INSERT INTO `warning_record` VALUES (59, 8, 'ADMISSION_COMPLETION_RATE', '招生完成率', 2022, 'LT', 90.00, 85.48, 'ACTIVE', '招生完成率 actual 85.48 threshold 90.00', '2026-04-13 22:02:10', NULL, '2026-04-13 22:02:10', '2026-04-13 22:02:10', 0);
+INSERT INTO `warning_record` VALUES (60, 8, 'POSTGRADUATE_RATE', '升学率', 2022, 'LT', 15.00, 13.20, 'ACTIVE', '升学率 actual 13.20 threshold 15.00', '2026-04-13 22:02:10', NULL, '2026-04-13 22:02:10', '2026-04-13 22:02:10', 0);
+INSERT INTO `warning_record` VALUES (61, 8, 'ADMISSION_COMPLETION_RATE', '招生完成率', 2023, 'LT', 90.00, 89.23, 'ACTIVE', '招生完成率 actual 89.23 threshold 90.00', '2026-04-13 22:02:10', NULL, '2026-04-13 22:02:10', '2026-04-13 22:02:10', 0);
 
 SET FOREIGN_KEY_CHECKS = 1;
