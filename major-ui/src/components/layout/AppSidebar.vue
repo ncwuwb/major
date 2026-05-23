@@ -50,8 +50,7 @@ function handleNavigate(path) {
         <img class="sidebar__logo" src="/logo.png" alt="平台 Logo" />
       </div>
       <div v-if="!appStore.sidebarCollapsed" class="sidebar__brand-text">
-        <strong>专业监测平台</strong>
-        <span>Major Resource Dashboard</span>
+        <strong>专业数据监测平台</strong>
       </div>
     </div>
 

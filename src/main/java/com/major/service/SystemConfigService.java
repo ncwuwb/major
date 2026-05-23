@@ -8,6 +8,7 @@ import com.major.common.response.PageResponse;
 import com.major.common.util.PageUtils;
 import com.major.domain.entity.IndicatorRuleEntity;
 import com.major.mapper.IndicatorRuleMapper;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -38,11 +39,13 @@ public class SystemConfigService {
         return entity;
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void saveIndicatorRule(IndicatorRuleEntity entity) {
         ensureUniqueCode(entity.getIndicatorCode(), null);
         indicatorRuleMapper.insert(entity);
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void updateIndicatorRule(Integer id, IndicatorRuleEntity entity) {
         getIndicatorRule(id);
         ensureUniqueCode(entity.getIndicatorCode(), id);
@@ -50,6 +53,7 @@ public class SystemConfigService {
         indicatorRuleMapper.updateById(entity);
     }
 
+    @CacheEvict(cacheNames = {"dashboard:overview", "dashboard:score", "dashboard:warningMetrics"}, allEntries = true)
     public void deleteIndicatorRule(Integer id) {
         getIndicatorRule(id);
         indicatorRuleMapper.deleteById(id);

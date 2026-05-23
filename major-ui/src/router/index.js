@@ -1,4 +1,4 @@
-﻿import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 
 import { canAccessRoute } from '@/permission'
 import { baseRoutes } from '@/router/routes'

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "数据导出", description = "专业汇总、预警清单和年度指标等 Excel 导出接口")
+@Tag(name = "数据导出", description = "专业汇总、预警清单、年度指标趋势和年度业务数据等 Excel 导出接口")
 @RestController
 @RequestMapping("/api/export")
 public class ExportController {
@@ -67,5 +67,23 @@ public class ExportController {
                                        @RequestParam(required = false) Integer endYear,
                                        @Parameter(hidden = true) HttpServletResponse response) throws IOException {
         exportService.exportAnnualIndicators(deptId, majorId, startYear, endYear, response);
+    }
+
+    @Operation(summary = "导出年度业务数据", description = "按数据类型(admissions/fundings等)、学院、专业、教师、学生和年份筛选导出对应业务数据 Excel。")
+    @GetMapping("/data")
+    public void exportData(@Parameter(description = "数据类型: admissions | fundings | graduateOutcomes | achievements | competitions | internationalExchanges", example = "admissions")
+                           @RequestParam String type,
+                           @Parameter(description = "学院ID", example = "1")
+                           @RequestParam(required = false) Integer deptId,
+                           @Parameter(description = "专业ID", example = "1")
+                           @RequestParam(required = false) Integer majorId,
+                           @Parameter(description = "教师ID", example = "1")
+                           @RequestParam(required = false) Integer teacherId,
+                           @Parameter(description = "学生ID", example = "1")
+                           @RequestParam(required = false) Integer studentId,
+                           @Parameter(description = "统计年份", example = "2025")
+                           @RequestParam(required = false) Integer year,
+                           @Parameter(hidden = true) HttpServletResponse response) throws IOException {
+        exportService.exportData(type, deptId, majorId, teacherId, studentId, year, response);
     }
 }

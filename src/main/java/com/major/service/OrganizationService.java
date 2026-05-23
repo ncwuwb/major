@@ -312,7 +312,7 @@ public class OrganizationService {
 
     private void validateUserScope(String scopeType, Long scopeId) {
         if (!StringUtils.hasText(scopeType) || scopeId == null) {
-            throw new BusinessException(400, "User scope is required");
+            throw new BusinessException(400, "需要用户权限范围");
         }
         if (Objects.equals(scopeType, "SCHOOL")) {
             getSchool(scopeId.intValue());
@@ -321,7 +321,7 @@ public class OrganizationService {
         } else if (Objects.equals(scopeType, "MAJOR")) {
             referenceAssertService.requireMajor(scopeId.intValue());
         } else {
-            throw new BusinessException(400, "Invalid scope type");
+            throw new BusinessException(400, "无效的范围类型");
         }
     }
 
@@ -332,7 +332,7 @@ public class OrganizationService {
             wrapper.ne("school_id", excludeId);
         }
         if (schoolMapper.selectCount(wrapper) > 0) {
-            throw new BusinessException(400, "School code already exists");
+            throw new BusinessException(400, "该学校已存在");
         }
     }
 
@@ -343,7 +343,7 @@ public class OrganizationService {
             wrapper.ne("dept_id", excludeId);
         }
         if (departmentMapper.selectCount(wrapper) > 0) {
-            throw new BusinessException(400, "Department code already exists");
+            throw new BusinessException(400, "该部门已存在");
         }
     }
 
@@ -354,7 +354,7 @@ public class OrganizationService {
             wrapper.ne("major_id", excludeId);
         }
         if (majorMapper.selectCount(wrapper) > 0) {
-            throw new BusinessException(400, "Major code already exists");
+            throw new BusinessException(400, "该专业代码已存在");
         }
     }
 
@@ -365,7 +365,7 @@ public class OrganizationService {
             wrapper.ne("user_id", excludeId);
         }
         if (sysUserMapper.selectCount(wrapper) > 0) {
-            throw new BusinessException(400, "Username already exists");
+            throw new BusinessException(400, "用户名已经存在！");
         }
     }
 }

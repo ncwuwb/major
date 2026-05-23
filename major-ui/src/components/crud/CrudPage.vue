@@ -327,7 +327,6 @@ onMounted(async () => {
       <div class="section-title crud-page__header">
         <div>
           <h2>{{ config.title }}</h2>
-          <p>统一筛选、操作和表格展示区，方便答辩时连续演示数据管理闭环。</p>
         </div>
         <el-tag type="info" effect="plain">{{ total }} 条记录</el-tag>
       </div>

@@ -4,10 +4,11 @@ import { ElMessage } from 'element-plus'
 import { UploadFilled } from '@element-plus/icons-vue'
 
 import EmptyState from '@/components/common/EmptyState.vue'
-import { importData } from '@/api/importExport'
+import { importData, downloadTemplate } from '@/api/importExport'
 import { RESOURCE_IMPORT_OPTIONS } from '@/constants/static-options'
 
 const uploading = ref(false)
+const downloading = ref(false)
 const selectedType = ref(RESOURCE_IMPORT_OPTIONS[0].value)
 const fileList = ref([])
 const selectedFile = ref(null)
@@ -27,6 +28,16 @@ function handleFileChange(file, files) {
 function handleRemove() {
   selectedFile.value = null
   fileList.value = []
+}
+
+async function handleDownloadTemplate() {
+  downloading.value = true
+  try {
+    await downloadTemplate(selectedType.value)
+    ElMessage.success('模板下载完成')
+  } finally {
+    downloading.value = false
+  }
 }
 
 async function handleImport() {
@@ -83,6 +94,7 @@ async function handleImport() {
 
           <div class="toolbar" style="margin-top: 18px;">
             <el-button type="primary" :loading="uploading" @click="handleImport">开始导入</el-button>
+            <el-button @click="handleDownloadTemplate" :loading="downloading">下载导入模板</el-button>
             <el-button @click="handleRemove">清空文件</el-button>
           </div>
         </div>

@@ -19,7 +19,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -35,6 +37,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -103,6 +106,52 @@ public class ImportService {
                 task.getFailRows(), task.getErrorMessage());
     }
 
+    public void downloadTemplate(String type, HttpServletResponse response) throws IOException {
+        String[] headers;
+        String fileName;
+
+        switch (type.toLowerCase(Locale.ROOT)) {
+            case "teachers":
+                headers = new String[]{"教师工号", "学院ID", "教师姓名", "职称", "学位", "是否博士（1=是，0=否）", "聘用类型（如：全职、兼任）"};
+                fileName = "教师数据导入模板.xlsx";
+                break;
+            case "students":
+                headers = new String[]{"学号", "专业ID", "学生姓名", "性别（男/女）", "入学年份（如：2023）", "状态（如：在校、毕业）"};
+                fileName = "学生数据导入模板.xlsx";
+                break;
+            case "courses":
+                headers = new String[]{"课程代码", "专业ID", "课程名称", "课程类型（如：必修、选修）", "学分", "开课学期（如：2024春）"};
+                fileName = "课程数据导入模板.xlsx";
+                break;
+            case "admissions":
+                headers = new String[]{"专业ID", "年份", "计划人数", "录取人数", "最低分", "最高分"};
+                fileName = "招生数据导入模板.xlsx";
+                break;
+            case "fundings":
+                headers = new String[]{"专业ID", "年份", "分配经费", "已使用经费", "使用率"};
+                fileName = "经费数据导入模板.xlsx";
+                break;
+            case "graduate-outcomes":
+                headers = new String[]{"专业ID", "年份", "毕业人数", "就业率", "升学率", "平均薪资"};
+                fileName = "毕业去向导入模板.xlsx";
+                break;
+            default:
+                throw new BusinessException(400, "不支持的导入模板类型: " + type);
+        }
+
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("导入模板");
+            Row headerRow = sheet.createRow(0);
+            for (int i = 0; i < headers.length; i++) {
+                headerRow.createCell(i).setCellValue(headers[i]);
+            }
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+            response.setHeader("Content-Disposition", "attachment; filename*=UTF-8''" + URLEncoder.encode(fileName, "UTF-8"));
+            workbook.write(response.getOutputStream());
+        }
+    }
+
     private void handleRow(String type, Map<String, String> row) {
         switch (type.toLowerCase(Locale.ROOT)) {
             case "teachers":
@@ -112,8 +161,8 @@ public class ImportService {
                 teacher.setName(required(row, "name", "教师姓名"));
                 teacher.setTitle(optional(row, "title", "职称"));
                 teacher.setDegree(optional(row, "degree", "学位"));
-                teacher.setPhdFlag(optionalInt(row, 0, "phdFlag", "是否博士"));
-                teacher.setEmploymentType(optional(row, "employmentType", "聘用类型"));
+                teacher.setPhdFlag(optionalInt(row, 0, "phdFlag", "是否博士", "是否博士（1=是，0=否）"));
+                teacher.setEmploymentType(optional(row, "employmentType", "聘用类型", "聘用类型（如：全职、兼任）"));
                 masterDataService.saveTeacher(teacher);
                 break;
             case "students":
@@ -121,9 +170,9 @@ public class ImportService {
                 student.setStudentNo(required(row, "studentNo", "学号"));
                 student.setMajorId(requiredInt(row, "majorId", "专业ID"));
                 student.setName(required(row, "name", "学生姓名"));
-                student.setGender(optional(row, "gender", "性别"));
-                student.setEnrollmentYear(optionalInt(row, null, "enrollmentYear", "入学年份"));
-                student.setStatus(optional(row, "status", "状态"));
+                student.setGender(optional(row, "gender", "性别", "性别（男/女）"));
+                student.setEnrollmentYear(optionalInt(row, null, "enrollmentYear", "入学年份", "入学年份（如：2023）"));
+                student.setStatus(optional(row, "status", "状态", "状态（如：在校、毕业）"));
                 masterDataService.saveStudent(student);
                 break;
             case "courses":
@@ -131,12 +180,12 @@ public class ImportService {
                 course.setCourseCode(required(row, "courseCode", "课程代码"));
                 course.setMajorId(requiredInt(row, "majorId", "专业ID"));
                 course.setName(required(row, "name", "课程名称"));
-                course.setType(optional(row, "type", "课程类型"));
+                course.setType(optional(row, "type", "课程类型", "课程类型（如：必修、选修）"));
                 String credits = optional(row, "credits", "学分");
                 if (credits != null) {
                     course.setCredits(new BigDecimal(credits));
                 }
-                course.setSemester(optional(row, "semester", "开课学期"));
+                course.setSemester(optional(row, "semester", "开课学期", "开课学期（如：2024春）"));
                 masterDataService.saveCourse(course);
                 break;
             case "admissions":

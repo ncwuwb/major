@@ -13,6 +13,15 @@ export function importData(type, file) {
   })
 }
 
+export async function downloadTemplate(type) {
+  const response = await request({
+    url: `/import/template/${type}`,
+    method: 'get',
+    responseType: 'blob',
+  })
+  downloadBlob(response, `${type}-template.xlsx`)
+}
+
 function downloadBlob(response, fallbackName) {
   const blob = new Blob([response.data])
   const link = document.createElement('a')
@@ -56,4 +65,14 @@ export async function exportAnnualIndicators(params) {
     responseType: 'blob',
   })
   downloadBlob(response, 'annual-indicators.xlsx')
+}
+
+export async function exportData(type, params) {
+  const response = await request({
+    url: '/export/data',
+    method: 'get',
+    params: { type, ...params },
+    responseType: 'blob',
+  })
+  downloadBlob(response, `${type}.xlsx`)
 }
