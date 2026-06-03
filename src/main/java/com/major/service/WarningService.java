@@ -2,6 +2,7 @@ package com.major.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.major.common.constant.CompareTypeConstants;
+import com.major.security.SecurityUtils;
 import com.major.domain.entity.AdmissionEntity;
 import com.major.domain.entity.FundingEntity;
 import com.major.domain.entity.GraduateOutcomeEntity;
@@ -238,6 +239,18 @@ public class WarningService {
             warning.setClearedAt(LocalDateTime.now());
             warningRecordMapper.updateById(warning);
         }
+    }
+
+    public void handleWarning(Long warningId, String handleMsg) {
+        WarningRecordEntity warning = warningRecordMapper.selectById(warningId);
+        if (warning == null || !"ACTIVE".equals(warning.getStatus())) {
+            throw new IllegalArgumentException("预警记录不存在或已处理");
+        }
+        warning.setStatus("HANDLED");
+        warning.setHandleMsg(handleMsg);
+        warning.setHandleUser(SecurityUtils.getLoginUser().getRealName());
+        warning.setHandleTime(LocalDateTime.now());
+        warningRecordMapper.updateById(warning);
     }
 
     private List<Integer> resolveYears(Integer majorId) {

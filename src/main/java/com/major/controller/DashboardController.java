@@ -5,10 +5,13 @@ import com.major.domain.dto.DashboardFilterRequest;
 import com.major.domain.dto.DashboardRankRequest;
 import com.major.domain.dto.DashboardTrendRequest;
 import com.major.service.DashboardService;
+import com.major.service.WarningService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.Map;
 import javax.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,9 +24,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class DashboardController {
 
     private final DashboardService dashboardService;
+    private final WarningService warningService;
 
-    public DashboardController(DashboardService dashboardService) {
+    public DashboardController(DashboardService dashboardService, WarningService warningService) {
         this.dashboardService = dashboardService;
+        this.warningService = warningService;
     }
 
     @Operation(tags = { "监测分析" }, summary = "获取监测概览", description = "返回当前数据范围下的核心概览指标。请求体可为空，空值时默认使用当前用户权限范围。")
@@ -68,6 +73,13 @@ public class DashboardController {
     @PostMapping("/warnings/metrics")
     public ApiResponse<?> warningMetrics(@RequestBody(required = false) DashboardFilterRequest request) {
         return ApiResponse.success(dashboardService.warningMetrics(request));
+    }
+
+    @Operation(tags = { "预警管理" }, summary = "处理预警反馈", description = "填写整改说明完成预警闭环处理。")
+    @PostMapping("/warnings/{warningId}/handle")
+    public ApiResponse<Void> handleWarning(@PathVariable Long warningId, @RequestBody Map<String, String> body) {
+        warningService.handleWarning(warningId, body.get("handleMsg"));
+        return ApiResponse.success();
     }
 
     @Operation(tags = { "监测分析" }, summary = "首页缓存预热", description = "预先加载首页常用查询结果到 Redis，减少首次访问首页的数据库压力。")

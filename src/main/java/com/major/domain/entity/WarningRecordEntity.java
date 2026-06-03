@@ -27,4 +27,7 @@ public class WarningRecordEntity extends BaseEntity {
     private String message;
     private LocalDateTime triggeredAt;
     private LocalDateTime clearedAt;
+    private String handleMsg;
+    private String handleUser;
+    private LocalDateTime handleTime;
 }

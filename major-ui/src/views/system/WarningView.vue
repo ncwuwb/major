@@ -1,12 +1,12 @@
 ﻿<script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { Download, Refresh } from '@element-plus/icons-vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
 import EmptyState from '@/components/common/EmptyState.vue'
 import { exportWarningList } from '@/api/importExport'
 import { STATUS_TAGS } from '@/constants/resource-config'
-import { recalculateWarnings } from '@/api/dashboard'
+import { recalculateWarnings, handleWarning } from '@/api/dashboard'
 import { listWarnings } from '@/api/warning'
 import { useAuthStore } from '@/stores/auth'
 import { useDictStore } from '@/stores/dicts'
@@ -24,6 +24,11 @@ const filters = reactive({
 })
 const warnings = ref([])
 const recalculating = ref(false)
+
+const handleDialogVisible = ref(false)
+const handlingWarning = ref(null)
+const handleForm = reactive({ handleMsg: '' })
+const submitting = ref(false)
 
 const majorOptions = computed(() => {
   if (filters.deptId) {
@@ -98,6 +103,34 @@ async function handleRecalculate() {
   }
 }
 
+function openHandleDialog(row) {
+  handlingWarning.value = row
+  handleForm.handleMsg = ''
+  handleDialogVisible.value = true
+}
+
+async function submitHandle() {
+  if (!handleForm.handleMsg.trim()) {
+    ElMessage.warning('请填写整改说明')
+    return
+  }
+  submitting.value = true
+  try {
+    await handleWarning(handlingWarning.value.warningId, { handleMsg: handleForm.handleMsg })
+    ElMessage.success('处理成功，预警已闭环')
+    handleDialogVisible.value = false
+    await loadWarnings()
+  } catch {
+    ElMessage.error('处理失败，请重试')
+  } finally {
+    submitting.value = false
+  }
+}
+
+function canHandle(status) {
+  return status === 'ACTIVE'
+}
+
 watch(
   () => filters.deptId,
   (value, previous) => {
@@ -119,7 +152,7 @@ onMounted(async () => {
       <div class="section-title warning-view__header">
         <div>
           <h2>预警中心</h2>
-          <p>在同一张卡片中完成筛选、重算、导出和结果查看，方便答辩时连续演示预警闭环。</p>
+          <p></p>
         </div>
         <el-tag type="danger" effect="dark">{{ warnings.length }} 条预警</el-tag>
       </div>
@@ -175,11 +208,51 @@ onMounted(async () => {
           <template #default="scope">{{ formatDateTime(scope.row.triggeredAt) }}</template>
         </el-table-column>
         <el-table-column label="说明" prop="message" min-width="240" show-overflow-tooltip />
+        <el-table-column label="操作" width="160" fixed="right">
+          <template #default="scope">
+            <el-button
+              v-if="canHandle(scope.row.status)"
+              type="primary"
+              size="small"
+              @click="openHandleDialog(scope.row)"
+            >处理反馈</el-button>
+            <span v-else style="color:var(--el-text-color-placeholder);font-size:13px">
+              {{ scope.row.handleUser ? scope.row.handleUser + ' 已处理' : '已解除' }}
+            </span>
+          </template>
+        </el-table-column>
         <template #empty>
           <EmptyState title="当前没有预警记录" description="说明指标运行整体平稳，或可以调整筛选条件查看其他范围。" />
         </template>
       </el-table>
     </section>
+
+    <el-dialog v-model="handleDialogVisible" title="预警处理反馈" width="520px" :close-on-click-modal="false">
+      <div v-if="handlingWarning" style="display:flex;flex-direction:column;gap:16px">
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:8px 16px;font-size:14px">
+          <span style="color:var(--el-text-color-secondary)">专业：</span>
+          <span>{{ handlingWarning.majorName }}</span>
+          <span style="color:var(--el-text-color-secondary)">指标：</span>
+          <span>{{ handlingWarning.indicatorName }}</span>
+          <span style="color:var(--el-text-color-secondary)">年份：</span>
+          <span>{{ handlingWarning.statYear }}</span>
+          <span style="color:var(--el-text-color-secondary)">阈值：</span>
+          <span>{{ formatValue(handlingWarning.thresholdValue) }}</span>
+          <span style="color:var(--el-text-color-secondary)">实际值：</span>
+          <span>{{ formatValue(handlingWarning.actualValue) }}</span>
+        </div>
+        <el-divider style="margin:0" />
+        <el-form label-position="top">
+          <el-form-item label="整改说明" required>
+            <el-input v-model="handleForm.handleMsg" type="textarea" :rows="4" placeholder="请填写针对该预警的整改措施或处理说明..." />
+          </el-form-item>
+        </el-form>
+      </div>
+      <template #footer>
+        <el-button @click="handleDialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="submitting" @click="submitHandle">提交闭环</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 

@@ -27,3 +27,7 @@ export function recalculateWarnings() {
 export function fetchWarningMetrics(data) {
   return request({ url: '/dashboard/warnings/metrics', method: 'post', data })
 }
+
+export function handleWarning(warningId, data) {
+  return request({ url: `/dashboard/warnings/${warningId}/handle`, method: 'post', data })
+}
